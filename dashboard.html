@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSC Traffic Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0f;
+            --card: #12121a;
+            --border: #1e1e2e;
+            --text: #e5e7eb;
+            --muted: #6b7280;
+            --green: #10b981;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --yellow: #f59e0b;
+            --cyan: #06b6d4;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 13px;
+        }
+
+        .header {
+            background: linear-gradient(180deg, #16161f 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        .logo:hover { opacity: 0.8; }
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--green), var(--cyan));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 12px;
+            color: var(--muted);
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        .stale-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--yellow);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .main { padding: 20px 24px; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+        }
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        .stat-icon { font-size: 24px; }
+        .stat-change {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .stat-change.up { background: rgba(16,185,129,0.15); color: var(--green); }
+        .stat-change.down { background: rgba(239,68,68,0.15); color: var(--red); }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .grid-wide {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .panel-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-body { padding: 20px; }
+        .panel-body.flush { padding: 0; }
+
+        .chart-box { height: 220px; }
+        .chart-box.sm { height: 200px; }
+        .chart-box.lg { height: 280px; }
+
+        .legend {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .search-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            width: 220px;
+        }
+        .search-input:focus { outline: none; border-color: var(--blue); }
+
+        .table-wrap {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left;
+            padding: 12px 20px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+            background: rgba(0,0,0,0.4);
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        th:hover { color: var(--text); }
+        th .sort-arrow { font-size: 9px; margin-left: 2px; }
+        td {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        tr.clickable { cursor: pointer; }
+        tr.clickable:hover { background: rgba(59,130,246,0.06); }
+        tr:last-child td { border-bottom: none; }
+
+        .site-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .site-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .site-dot.good { background: var(--green); }
+        .site-dot.warn { background: var(--yellow); }
+        .site-dot.bad { background: var(--red); }
+        .site-name {
+            font-weight: 500;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .mono {
+            font-family: 'SF Mono', Consolas, monospace;
+            font-size: 12px;
+        }
+        .trend { font-weight: 600; }
+        .trend.up { color: var(--green); }
+        .trend.down { color: var(--red); }
+        .spark { width: 120px; height: 24px; }
+
+        .toggle-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+        .toggle-btn.active {
+            background: color-mix(in srgb, var(--tc) 20%, transparent);
+            color: var(--tc);
+            border-color: color-mix(in srgb, var(--tc) 40%, transparent);
+        }
+        .toggle-btn:hover { border-color: var(--tc); }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+        .back-btn:hover { border-color: var(--blue); }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .detail-title {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .detail-badge {
+            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .detail-badge.up { background: rgba(16,185,129,0.15); color: var(--green); }
+        .detail-badge.down { background: rgba(239,68,68,0.15); color: var(--red); }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            gap: 16px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+        .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+        .warn-banner {
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats { grid-template-columns: repeat(3, 1fr); }
+            .grid, .grid-wide, .grid-4 { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .header { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div id="app"><div class="loading"><div class="spinner"></div><div style="color:var(--muted)">Загрузка...</div></div></div>
+
+<script>
+const API = 'https://puxnigzdbscstvjlyvbg.supabase.co/rest/v1';
+const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1eG5pZ3pkYnNjc3R2amx5dmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzMxNDIsImV4cCI6MjA5MTMwOTE0Mn0.fxNYsN9ZlXIoJSbQdflKLSP7w-69TY4r8AP3biZsdmY';
+
+let D = { sites: [], daily: [] };
+let S = { sort: 'clicks', sortDir: -1, search: '', view: 'overview', selectedSite: null };
+
+const q = async (table, params='') => {
+    try {
+        const r = await fetch(`${API}/${table}?${params}`, {
+            headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }
+        });
+        return r.ok ? await r.json() : [];
+    } catch(e) { console.error(e); return []; }
+};
+
+async function qAll(table, params='') {
+    // Supabase ограничивает 1000 строк за запрос — загружаем всё пагинацией
+    let all = [], offset = 0, batch = 1000;
+    while (true) {
+        const sep = params ? '&' : '';
+        const data = await q(table, `${params}${sep}limit=${batch}&offset=${offset}`);
+        all = all.concat(data);
+        if (data.length < batch) break;
+        offset += batch;
+    }
+    return all;
+}
+
+async function load() {
+    const latestSites = await q('traffic_sites', 'select=date&order=date.desc&limit=1');
+    const latestDate = latestSites?.[0]?.date;
+
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 60);
+    const cutoffStr = cutoff.toISOString().split('T')[0];
+
+    const sitesParams = latestDate
+        ? `date=eq.${latestDate}&order=clicks.desc&limit=200`
+        : 'order=clicks.desc&limit=200';
+
+    const [sites, daily] = await Promise.all([
+        q('traffic_sites', sitesParams),
+        qAll('traffic_daily', `date=gte.${cutoffStr}&order=date.asc`)
+    ]);
+    D.sites = sites || [];
+    D.daily = daily || [];
+
+    const dates = [...new Set(D.daily.map(d => d.date))].sort();
+    D.lastDate = dates[dates.length - 1];
+    D.firstDate = dates[0];
+    D.latestSiteDate = latestDate;
+
+    console.log('Loaded:', D.sites.length, 'sites,', D.daily.length, 'daily rows, date:', latestDate);
+}
+
+const shortUrl = u => u?.replace(/https?:\/\//, '').replace('sc-domain:', '').replace(/\/$/, '') || '';
+const fmt = n => {
+    if (n === null || n === undefined) return '—';
+    if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
+    return Math.round(n).toLocaleString();
+};
+const fmtDate = d => {
+    const dt = new Date(d);
+    return `${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,'0')}`;
+};
+
+function stats() {
+    const clicks = D.sites.reduce((s, x) => s + (x.clicks || 0), 0);
+    const impressions = D.sites.reduce((s, x) => s + (x.impressions || 0), 0);
+    const avgPos = D.sites.length ? D.sites.reduce((s, x) => s + (x.position || 0), 0) / D.sites.length : 0;
+    const avgCtr = D.sites.length ? D.sites.reduce((s, x) => s + (x.ctr || 0), 0) / D.sites.length : 0;
+    const avgChg = D.sites.length ? D.sites.reduce((s, x) => s + (x.clicks_change || 0), 0) / D.sites.length : 0;
+    return { clicks, impressions, avgPos, avgCtr, avgChg, count: D.sites.length };
+}
+
+function dailyTotals() {
+    const byDate = {};
+    D.daily.forEach(d => {
+        if (!byDate[d.date]) byDate[d.date] = { date: d.date, clicks: 0, impressions: 0, position: 0, ctr: 0, n: 0 };
+        byDate[d.date].clicks += d.clicks || 0;
+        byDate[d.date].impressions += d.impressions || 0;
+        byDate[d.date].position += d.position || 0;
+        byDate[d.date].ctr += d.ctr || 0;
+        byDate[d.date].n++;
+    });
+    return Object.values(byDate)
+        .map(d => ({ ...d, position: d.n ? d.position / d.n : 0, ctr: d.n ? d.ctr / d.n : 0 }))
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+function siteDaily(url) {
+    return D.daily.filter(d => d.site_url === url).sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+function siteDailyShort(url) {
+    return siteDaily(url).slice(-28);
+}
+
+function status(s) {
+    if ((s.clicks_change || 0) < -30) return 'bad';
+    if ((s.clicks_change || 0) < -10) return 'warn';
+    return 'good';
+}
+
+function isDataStale() {
+    if (!D.lastDate) return false;
+    const last = new Date(D.lastDate);
+    const now = new Date();
+    const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+    return diffDays > 5;
+}
+
+function staleDays() {
+    if (!D.lastDate) return 0;
+    const last = new Date(D.lastDate);
+    const now = new Date();
+    return Math.floor((now - last) / (1000 * 60 * 60 * 24));
+}
+
+let charts = {};
+let sparkCharts = [];
+
+function destroyAllCharts() {
+    Object.values(charts).forEach(c => { if (c) c.destroy(); });
+    charts = {};
+    sparkCharts.forEach(c => c.destroy());
+    sparkCharts = [];
+}
+
+function makeChart(canvasId, config) {
+    const el = document.getElementById(canvasId);
+    if (!el) return;
+    if (charts[canvasId]) charts[canvasId].destroy();
+    charts[canvasId] = new Chart(el, config);
+}
+
+const chartDefaults = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { intersect: false, mode: 'index' },
+    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e1e2e', padding: 12, titleFont: { size: 11 }, bodyFont: { size: 11 } } }
+};
+
+function drawOverviewCharts() {
+    const daily = dailyTotals();
+    if (!daily.length) return;
+    const labels = daily.map(d => fmtDate(d.date));
+
+    makeChart('chartTraffic', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Клики', data: daily.map(d => d.clicks), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 },
+                { label: 'Показы', data: daily.map(d => d.impressions), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.05)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, yAxisID: 'y1' }
+            ]
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 15 } },
+                y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#3b82f6', font: { size: 10 }, callback: v => fmt(v) } },
+                y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#8b5cf6', font: { size: 10 }, callback: v => fmt(v) } }
+            }
+        }
+    });
+
+    makeChart('chartPosition', {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{ label: 'Позиция', data: daily.map(d => d.position), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 }]
+        },
+        options: {
+            ...chartDefaults,
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 12 } },
+                y: { reverse: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#f59e0b', font: { size: 10 } } }
+            }
+        }
+    });
+
+    const top = D.sites.slice(0, 8);
+    if (top.length) {
+        makeChart('chartTop', {
+            type: 'bar',
+            data: {
+                labels: top.map(s => shortUrl(s.site_url).substring(0, 14)),
+                datasets: [{ data: top.map(s => s.clicks), backgroundColor: ['#3b82f6','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#6366f1'], borderRadius: 6 }]
+            },
+            options: {
+                indexAxis: 'y', ...chartDefaults,
+                scales: {
+                    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => fmt(v) } },
+                    y: { grid: { display: false }, ticks: { color: '#e5e7eb', font: { size: 10 } } }
+                }
+            }
+        });
+    }
+}
+
+// Состояние видимости метрик в детальном графике
+let detailVisible = { clicks: true, impressions: true, position: false, ctr: false };
+
+function toggleMetric(key) {
+    detailVisible[key] = !detailVisible[key];
+    // Обновляем кнопки
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+        const k = btn.dataset.metric;
+        btn.classList.toggle('active', detailVisible[k]);
+    });
+    // Обновляем видимость datasets
+    if (charts.detailChart) {
+        const map = { clicks: 0, impressions: 1, position: 2, ctr: 3 };
+        Object.entries(map).forEach(([k, idx]) => {
+            const meta = charts.detailChart.getDatasetMeta(idx);
+            meta.hidden = !detailVisible[k];
+        });
+        // Показываем/скрываем оси
+        const yAxes = charts.detailChart.options.scales;
+        yAxes.yClicks.display = detailVisible.clicks;
+        yAxes.yImpr.display = detailVisible.impressions;
+        yAxes.yPos.display = detailVisible.position;
+        yAxes.yCtr.display = detailVisible.ctr;
+        charts.detailChart.update();
+    }
+}
+
+function drawDetailChart(siteUrl) {
+    const daily = siteDaily(siteUrl);
+    if (!daily.length) return;
+    const labels = daily.map(d => fmtDate(d.date));
+
+    const el = document.getElementById('detailChart');
+    if (!el) return;
+    if (charts.detailChart) charts.detailChart.destroy();
+
+    charts.detailChart = new Chart(el, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Клики', data: daily.map(d => d.clicks), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yClicks', hidden: !detailVisible.clicks },
+                { label: 'Показы', data: daily.map(d => d.impressions), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yImpr', hidden: !detailVisible.impressions },
+                { label: 'Позиция', data: daily.map(d => d.position), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', fill: false, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yPos', hidden: !detailVisible.position },
+                { label: 'CTR %', data: daily.map(d => (d.ctr * 100)), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: false, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yCtr', hidden: !detailVisible.ctr }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: '#1e1e2e', padding: 14, titleFont: { size: 12 }, bodyFont: { size: 12 },
+                    callbacks: {
+                        label: ctx => {
+                            const lbl = ctx.dataset.label;
+                            const v = ctx.raw;
+                            if (lbl === 'Позиция') return `${lbl}: ${v.toFixed(1)}`;
+                            if (lbl === 'CTR %') return `CTR: ${v.toFixed(2)}%`;
+                            return `${lbl}: ${fmt(v)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 15 } },
+                yClicks: { display: detailVisible.clicks, position: 'left', grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#3b82f6', font: { size: 10 }, callback: v => fmt(v) } },
+                yImpr: { display: detailVisible.impressions, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#8b5cf6', font: { size: 10 }, callback: v => fmt(v) } },
+                yPos: { display: detailVisible.position, position: 'left', reverse: true, grid: { drawOnChartArea: false }, ticks: { color: '#f59e0b', font: { size: 10 } } },
+                yCtr: { display: detailVisible.ctr, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#10b981', font: { size: 10 }, callback: v => v.toFixed(1) + '%' } }
+            }
+        }
+    });
+}
+
+function drawSparkline(canvas, data) {
+    if (!canvas || data.length < 2) return;
+    const up = data[data.length-1].clicks >= data[0].clicks;
+    const chart = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: data.map((_, i) => i),
+            datasets: [{ data: data.map(d => d.clicks), borderColor: up ? '#10b981' : '#ef4444', borderWidth: 1.5, pointRadius: 0, tension: 0.4 }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+    sparkCharts.push(chart);
+}
+
+function openSite(siteUrl) {
+    S.view = 'detail';
+    S.selectedSite = siteUrl;
+    render();
+}
+
+function goBack() {
+    S.view = 'overview';
+    S.selectedSite = null;
+    render();
+}
+
+function setSort(col) {
+    if (S.sort === col) S.sortDir *= -1;
+    else { S.sort = col; S.sortDir = -1; }
+    render();
+}
+
+function sortedSites() {
+    let sites = [...D.sites];
+    if (S.search) sites = sites.filter(s => shortUrl(s.site_url).toLowerCase().includes(S.search.toLowerCase()));
+    sites.sort((a, b) => ((b[S.sort] || 0) - (a[S.sort] || 0)) * S.sortDir);
+    return sites;
+}
+
+function sortArrow(col) {
+    if (S.sort !== col) return '';
+    return `<span class="sort-arrow">${S.sortDir === -1 ? '↓' : '↑'}</span>`;
+}
+
+function renderDetail() {
+    const site = D.sites.find(s => s.site_url === S.selectedSite);
+    if (!site) { goBack(); return; }
+
+    const daily = siteDaily(S.selectedSite);
+    const name = shortUrl(site.site_url);
+    const chg = site.clicks_change || 0;
+
+    // Calculate site-specific stats from daily data
+    const totalClicks = daily.reduce((s, d) => s + (d.clicks || 0), 0);
+    const totalImpr = daily.reduce((s, d) => s + (d.impressions || 0), 0);
+    const avgPos = daily.length ? daily.reduce((s, d) => s + (d.position || 0), 0) / daily.length : 0;
+    const avgCtr = daily.length ? daily.reduce((s, d) => s + (d.ctr || 0), 0) / daily.length : 0;
+
+    document.getElementById('app').innerHTML = `
+        <header class="header">
+            <div class="logo" onclick="goBack()">
+                <div class="logo-icon">📊</div>
+                GSC Traffic Monitor
+            </div>
+            <div class="header-right">
+                <span>${D.firstDate ? fmtDate(D.firstDate) : ''} — ${D.lastDate ? fmtDate(D.lastDate) : ''}</span>
+                <span>${daily.length} дней данных</span>
+            </div>
+        </header>
+
+        <main class="main">
+            <button class="back-btn" onclick="goBack()">← Все сайты</button>
+
+            <div class="detail-header">
+                <div class="detail-title">${name}</div>
+                <div class="detail-badge ${chg >= 0 ? 'up' : 'down'}">${chg >= 0 ? '↑' : '↓'} ${Math.abs(chg).toFixed(1)}% кликов vs пред. период</div>
+            </div>
+
+            <div class="stats" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">👆</span></div>
+                    <div class="stat-value" style="color:var(--blue)">${fmt(totalClicks)}</div>
+                    <div class="stat-label">Клики за период</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">👁</span></div>
+                    <div class="stat-value" style="color:var(--purple)">${fmt(totalImpr)}</div>
+                    <div class="stat-label">Показы за период</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">📍</span></div>
+                    <div class="stat-value" style="color:var(--yellow)">${avgPos.toFixed(1)}</div>
+                    <div class="stat-label">Ср. позиция</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">🎯</span></div>
+                    <div class="stat-value" style="color:var(--green)">${(avgCtr * 100).toFixed(2)}%</div>
+                    <div class="stat-label">Ср. CTR</div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">📈 Метрики по дням</div>
+                    <div style="display:flex;gap:8px;">
+                        <button class="toggle-btn ${detailVisible.clicks?'active':''}" data-metric="clicks" onclick="toggleMetric('clicks')" style="--tc:#3b82f6">Клики</button>
+                        <button class="toggle-btn ${detailVisible.impressions?'active':''}" data-metric="impressions" onclick="toggleMetric('impressions')" style="--tc:#8b5cf6">Показы</button>
+                        <button class="toggle-btn ${detailVisible.position?'active':''}" data-metric="position" onclick="toggleMetric('position')" style="--tc:#f59e0b">Позиция</button>
+                        <button class="toggle-btn ${detailVisible.ctr?'active':''}" data-metric="ctr" onclick="toggleMetric('ctr')" style="--tc:#10b981">CTR</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div style="height:400px"><canvas id="detailChart"></canvas></div></div>
+            </div>
+        </main>
+    `;
+
+    setTimeout(() => drawDetailChart(S.selectedSite), 50);
+}
+
+function render() {
+    destroyAllCharts();
+
+    if (S.view === 'detail' && S.selectedSite) {
+        renderDetail();
+        return;
+    }
+
+    const st = stats();
+    const sites = sortedSites();
+
+    if (!D.sites.length && !D.daily.length) {
+        document.getElementById('app').innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">📊</div>
+                <h2>Нет данных</h2>
+                <p style="margin-top:8px;color:var(--muted)">Запустите сбор данных через GitHub Actions</p>
+            </div>
+        `;
+        return;
+    }
+
+    const stale = isDataStale();
+    const days = staleDays();
+
+    document.getElementById('app').innerHTML = `
+        <header class="header">
+            <div class="logo" onclick="S.view='overview';S.selectedSite=null;render()">
+                <div class="logo-icon">📊</div>
+                GSC Traffic Monitor
+            </div>
+            <div class="header-right">
+                <span>${stale ? '<span class="stale-dot"></span>Устарело' : '<span class="live-dot"></span>Live'}</span>
+                <span>📅 ${D.lastDate || '—'}</span>
+                <span>🌐 ${st.count} сайтов</span>
+            </div>
+        </header>
+
+        <main class="main">
+            ${stale ? `<div class="warn-banner">⚠️ Данные устарели на ${days} дней (последние: ${D.lastDate}). Запустите GitHub Actions вручную или проверьте настройку workflow.</div>` : ''}
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-top">
+                        <span class="stat-icon">👆</span>
+                        <span class="stat-change ${st.avgChg >= 0 ? 'up' : 'down'}">${st.avgChg >= 0 ? '↑' : '↓'} ${Math.abs(st.avgChg).toFixed(1)}%</span>
+                    </div>
+                    <div class="stat-value" style="color:var(--blue)">${fmt(st.clicks)}</div>
+                    <div class="stat-label">Клики</div>
+                    <div class="stat-sub">Сумма за 30 дней по всем сайтам</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">👁</span></div>
+                    <div class="stat-value" style="color:var(--purple)">${fmt(st.impressions)}</div>
+                    <div class="stat-label">Показы</div>
+                    <div class="stat-sub">Сумма за 30 дней по всем сайтам</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">📍</span></div>
+                    <div class="stat-value" style="color:var(--yellow)">${st.avgPos.toFixed(1)}</div>
+                    <div class="stat-label">Ср. позиция</div>
+                    <div class="stat-sub">Среднее по всем сайтам</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">🎯</span></div>
+                    <div class="stat-value" style="color:var(--green)">${(st.avgCtr * 100).toFixed(2)}%</div>
+                    <div class="stat-label">Ср. CTR</div>
+                    <div class="stat-sub">Среднее по всем сайтам</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-top"><span class="stat-icon">🌐</span></div>
+                    <div class="stat-value" style="color:var(--cyan)">${st.count}</div>
+                    <div class="stat-label">Сайтов</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">📈 Ежедневный трафик</div>
+                        <div class="legend">
+                            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Клики</div>
+                            <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Показы</div>
+                        </div>
+                    </div>
+                    <div class="panel-body"><div class="chart-box"><canvas id="chartTraffic"></canvas></div></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header"><div class="panel-title">📍 Средняя позиция</div></div>
+                    <div class="panel-body"><div class="chart-box"><canvas id="chartPosition"></canvas></div></div>
+                </div>
+            </div>
+
+            <div class="grid-wide">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">🌐 Все сайты <span style="font-weight:400;font-size:11px;color:var(--muted);margin-left:8px">нажмите на сайт для детального просмотра</span></div>
+                        <input type="text" class="search-input" placeholder="Поиск..." value="${S.search}" oninput="S.search=this.value;render()">
+                    </div>
+                    <div class="panel-body flush">
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th onclick="setSort('site_url')">Сайт</th>
+                                        <th onclick="setSort('clicks')">Клики ${sortArrow('clicks')}</th>
+                                        <th onclick="setSort('impressions')">Показы ${sortArrow('impressions')}</th>
+                                        <th onclick="setSort('position')">Позиция ${sortArrow('position')}</th>
+                                        <th onclick="setSort('ctr')">CTR ${sortArrow('ctr')}</th>
+                                        <th>Тренд (28д)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sites.map((s, i) => `
+                                        <tr class="clickable" onclick="openSite('${s.site_url.replace(/'/g, "\\'")}')">
+                                            <td>
+                                                <div class="site-cell">
+                                                    <div class="site-dot ${status(s)}"></div>
+                                                    <span class="site-name" title="${shortUrl(s.site_url)}">${shortUrl(s.site_url)}</span>
+                                                </div>
+                                            </td>
+                                            <td class="mono">${fmt(s.clicks)}</td>
+                                            <td class="mono">${fmt(s.impressions)}</td>
+                                            <td class="mono">${(s.position||0).toFixed(1)}</td>
+                                            <td class="mono">${((s.ctr||0)*100).toFixed(2)}%</td>
+                                            <td><canvas class="spark" id="spark${i}"></canvas></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <div class="panel-header"><div class="panel-title">🏆 Топ-8 по кликам</div></div>
+                    <div class="panel-body"><div class="chart-box sm"><canvas id="chartTop"></canvas></div></div>
+                </div>
+            </div>
+        </main>
+    `;
+
+    setTimeout(() => {
+        drawOverviewCharts();
+        sites.forEach((s, i) => {
+            const c = document.getElementById(`spark${i}`);
+            const data = siteDailyShort(s.site_url);
+            if (c && data.length > 1) drawSparkline(c, data);
+        });
+    }, 50);
+}
+
+load().then(render);
+</script>
+</body>
+</html>

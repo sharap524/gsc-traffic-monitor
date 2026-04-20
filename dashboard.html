@@ -311,6 +311,28 @@
         .detail-badge.up { background: rgba(16,185,129,0.15); color: var(--green); }
         .detail-badge.down { background: rgba(239,68,68,0.15); color: var(--red); }
 
+        .filter-bar { display:flex; gap:12px; padding:10px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap; align-items:center; background:rgba(255,255,255,0.01); }
+        .filter-group { display:flex; align-items:center; gap:5px; }
+        .filter-label { font-size:11px; color:var(--muted); white-space:nowrap; margin-right:2px; }
+        .filter-btn { padding:4px 12px; border-radius:5px; font-size:12px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; white-space:nowrap; }
+        .filter-btn.active { background:rgba(59,130,246,0.15); color:var(--blue); border-color:rgba(59,130,246,0.4); }
+        .filter-btn:hover { border-color:var(--blue); color:var(--text); }
+
+        .compare-bar { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px); background:#1a1a2e; border:1px solid var(--blue); border-radius:12px; padding:12px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index:200; white-space:nowrap; }
+        .compare-bar.visible { transform:translateX(-50%) translateY(0); }
+        .compare-bar-btn { padding:7px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:opacity 0.2s; }
+        .compare-bar-btn.primary { background:var(--blue); color:#fff; }
+        .compare-bar-btn.secondary { background:transparent; border:1px solid var(--border); color:var(--muted); }
+        .compare-bar-btn:hover { opacity:0.8; }
+
+        .check-cell { width:36px !important; padding:0 10px !important; }
+        .check-cell input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var(--blue); }
+        tr.selected-row { background:rgba(59,130,246,0.06) !important; }
+
+        .compare-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600; }
+        .cmp-metric-btn { padding:5px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+        .cmp-metric-btn.active { background:rgba(59,130,246,0.15); color:var(--blue); border-color:rgba(59,130,246,0.4); }
+
         .detail-tabs { display: flex; gap: 4px; }
         .detail-tab {
             padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
@@ -383,7 +405,7 @@ const API = 'https://puxnigzdbscstvjlyvbg.supabase.co/rest/v1';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1eG5pZ3pkYnNjc3R2amx5dmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzMxNDIsImV4cCI6MjA5MTMwOTE0Mn0.fxNYsN9ZlXIoJSbQdflKLSP7w-69TY4r8AP3biZsdmY';
 
 let D = { sites: [], daily: [] };
-let S = { sort: 'clicks', sortDir: -1, search: '', view: 'overview', selectedSite: null };
+let S = { sort: 'clicks', sortDir: -1, search: '', view: 'overview', selectedSite: null, selected: new Set(), statusFilter: '', compareMetric: 'clicks' };
 
 const q = async (table, params='') => {
     try {
@@ -788,6 +810,7 @@ function setSort(col) {
 function sortedSites() {
     let sites = [...D.sites];
     if (S.search) sites = sites.filter(s => shortUrl(s.site_url).toLowerCase().includes(S.search.toLowerCase()));
+    if (S.statusFilter) sites = sites.filter(s => status(s) === S.statusFilter);
     sites.sort((a, b) => ((b[S.sort] || 0) - (a[S.sort] || 0)) * S.sortDir);
     return sites;
 }
@@ -802,6 +825,166 @@ function filterSites(val) {
     const q = val.toLowerCase();
     document.querySelectorAll('tr[data-url]').forEach(tr => {
         tr.style.display = (!q || tr.dataset.url.includes(q)) ? '' : 'none';
+    });
+}
+
+function setStatusFilter(f) {
+    S.statusFilter = f;
+    render();
+}
+
+function toggleSelect(url, e) {
+    if (e) e.stopPropagation();
+    if (S.selected.has(url)) S.selected.delete(url);
+    else S.selected.add(url);
+    // Update row highlight
+    document.querySelectorAll('tr[data-url]').forEach(tr => {
+        if (tr.dataset.siteurl === url) tr.classList.toggle('selected-row', S.selected.has(url));
+    });
+    // Update checkbox
+    document.querySelectorAll(`input[data-cmp="${CSS.escape(url)}"]`).forEach(cb => cb.checked = S.selected.has(url));
+    // Update compare bar
+    const bar = document.getElementById('compare-bar');
+    if (bar) {
+        bar.classList.toggle('visible', S.selected.size >= 2);
+        const cnt = bar.querySelector('.cmp-count'); if (cnt) cnt.textContent = S.selected.size;
+    }
+}
+
+function clearSelection() {
+    S.selected.clear();
+    render();
+}
+
+function openComparison() {
+    if (S.selected.size < 2) return;
+    S.view = 'compare';
+    render();
+}
+
+const CMP_COLORS = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'];
+
+function renderComparison() {
+    const selectedArr = [...S.selected];
+    const sites = selectedArr.map(url => D.sites.find(s => s.site_url === url)).filter(Boolean);
+
+    document.getElementById('app').innerHTML = `
+        <header class="header">
+            <div class="logo" onclick="S.view='overview';S.selectedSite=null;render()">
+                <div class="logo-icon">📊</div>GSC Traffic Monitor
+            </div>
+            <div class="header-right">
+                <span>🌐 ${D.lastDate || '—'}</span>
+            </div>
+        </header>
+        <main class="main">
+            <button class="back-btn" onclick="S.view='overview';render()">← Все сайты</button>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+                <span style="font-size:18px;font-weight:700">📊 Сравнение сайтов</span>
+                ${sites.map((s,i) => `<span class="compare-chip" style="background:${CMP_COLORS[i]}22;color:${CMP_COLORS[i]};border:1px solid ${CMP_COLORS[i]}44">${shortUrl(s.site_url)}</span>`).join('')}
+            </div>
+            <div class="panel" style="margin-bottom:16px">
+                <div class="panel-header">
+                    <div class="panel-title">📈 Трафик по дням</div>
+                    <div style="display:flex;gap:6px">
+                        <button class="cmp-metric-btn ${S.compareMetric==='clicks'?'active':''}" onclick="S.compareMetric='clicks';drawCompareChart()">Клики</button>
+                        <button class="cmp-metric-btn ${S.compareMetric==='impressions'?'active':''}" onclick="S.compareMetric='impressions';drawCompareChart()">Показы</button>
+                        <button class="cmp-metric-btn ${S.compareMetric==='position'?'active':''}" onclick="S.compareMetric='position';drawCompareChart()">Позиция</button>
+                        <button class="cmp-metric-btn ${S.compareMetric==='ctr'?'active':''}" onclick="S.compareMetric='ctr';drawCompareChart()">CTR</button>
+                    </div>
+                </div>
+                <div class="panel-body"><div style="height:380px"><canvas id="compareChart"></canvas></div></div>
+            </div>
+            <div class="panel">
+                <div class="panel-header"><div class="panel-title">📋 Сводная таблица (за период)</div></div>
+                <div class="panel-body flush">
+                    <table>
+                        <thead><tr>
+                            <th></th><th>Сайт</th>
+                            <th class="mono" style="text-align:right">Клики</th>
+                            <th class="mono" style="text-align:right">Показы</th>
+                            <th class="mono" style="text-align:right">Позиция</th>
+                            <th class="mono" style="text-align:right">CTR</th>
+                            <th class="mono" style="text-align:right">Изм. кликов</th>
+                        </tr></thead>
+                        <tbody>
+                        ${sites.map((s,i) => `<tr>
+                            <td style="width:12px;padding:0 12px"><div style="width:10px;height:10px;border-radius:50%;background:${CMP_COLORS[i]}"></div></td>
+                            <td><b>${shortUrl(s.site_url)}</b></td>
+                            <td class="mono" style="text-align:right">${fmt(s.clicks)}</td>
+                            <td class="mono" style="text-align:right">${fmt(s.impressions)}</td>
+                            <td class="mono" style="text-align:right">${(s.position||0).toFixed(1)}</td>
+                            <td class="mono" style="text-align:right">${((s.ctr||0)*100).toFixed(2)}%</td>
+                            <td class="mono trend ${(s.clicks_change||0)>=0?'up':'down'}" style="text-align:right">${(s.clicks_change||0)>=0?'+':''}${(s.clicks_change||0).toFixed(1)}%</td>
+                        </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    `;
+    setTimeout(drawCompareChart, 50);
+}
+
+function drawCompareChart() {
+    if (charts.compareChart) { charts.compareChart.destroy(); delete charts.compareChart; }
+    const canvas = document.getElementById('compareChart');
+    if (!canvas) return;
+    const selectedArr = [...S.selected];
+    // Get all dates union
+    const allDates = [...new Set(D.daily.map(d => d.date))].sort();
+    // Last 35 days
+    const dates = allDates.slice(-35);
+    const labels = dates.map(d => fmtDate(d));
+    const metric = S.compareMetric;
+    const isCtr = metric === 'ctr';
+    const isPct = isCtr;
+
+    // Update metric buttons
+    document.querySelectorAll('.cmp-metric-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(
+            metric === 'clicks' ? 'клик' : metric === 'impressions' ? 'показ' : metric === 'position' ? 'позиц' : 'ctr'
+        ));
+    });
+
+    const datasets = selectedArr.map((url, i) => {
+        const dailyMap = {};
+        D.daily.filter(d => d.site_url === url).forEach(d => dailyMap[d.date] = d);
+        const data = dates.map(d => {
+            const row = dailyMap[d];
+            if (!row) return null;
+            return isCtr ? +(row[metric]*100).toFixed(2) : row[metric];
+        });
+        return {
+            label: shortUrl(url),
+            data,
+            borderColor: CMP_COLORS[i],
+            backgroundColor: CMP_COLORS[i] + '18',
+            fill: false,
+            tension: 0.4,
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            spanGaps: true
+        };
+    });
+
+    const yReverse = metric === 'position';
+    charts.compareChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true, maintainAspectRatio: false, animation: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { display: true, position: 'top', labels: { color: '#9ca3af', boxWidth: 12, font: { size: 11 } } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${isPct ? ctx.parsed.y + '%' : fmt(ctx.parsed.y)}` } }
+            },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 12 } },
+                y: { reverse: yReverse, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#9ca3af', font: { size: 10 }, callback: v => isPct ? v + '%' : fmt(v) } }
+            }
+        }
     });
 }
 
@@ -890,10 +1073,8 @@ function renderDetail() {
 function render() {
     destroyAllCharts();
 
-    if (S.view === 'detail' && S.selectedSite) {
-        renderDetail();
-        return;
-    }
+    if (S.view === 'detail' && S.selectedSite) { renderDetail(); return; }
+    if (S.view === 'compare' && S.selected.size >= 2) { renderComparison(); return; }
 
     const st = stats();
     const sites = sortedSites();
@@ -982,22 +1163,43 @@ function render() {
                         <div class="panel-title">🌐 Все сайты <span style="font-weight:400;font-size:11px;color:var(--muted);margin-left:8px">нажмите на сайт для детального просмотра</span></div>
                         <input type="text" class="search-input" id="siteSearch" placeholder="Поиск..." value="${S.search}" oninput="filterSites(this.value)">
                     </div>
+                    <div class="filter-bar">
+                        <div class="filter-group">
+                            <span class="filter-label">Статус:</span>
+                            <button class="filter-btn ${!S.statusFilter?'active':''}" onclick="setStatusFilter('')">Все</button>
+                            <button class="filter-btn ${S.statusFilter==='good'?'active':''}" onclick="setStatusFilter('good')">🟢 Хорошо</button>
+                            <button class="filter-btn ${S.statusFilter==='warn'?'active':''}" onclick="setStatusFilter('warn')">🟡 Внимание</button>
+                            <button class="filter-btn ${S.statusFilter==='bad'?'active':''}" onclick="setStatusFilter('bad')">🔴 Плохо</button>
+                        </div>
+                        <div class="filter-group" style="margin-left:auto">
+                            <span class="filter-label">Сортировка:</span>
+                            <button class="filter-btn ${S.sort==='clicks'?'active':''}" onclick="setSort('clicks')">Клики ${S.sort==='clicks'?(S.sortDir===-1?'↓':'↑'):''}</button>
+                            <button class="filter-btn ${S.sort==='impressions'?'active':''}" onclick="setSort('impressions')">Показы ${S.sort==='impressions'?(S.sortDir===-1?'↓':'↑'):''}</button>
+                            <button class="filter-btn ${S.sort==='position'?'active':''}" onclick="setSort('position')">Позиция ${S.sort==='position'?(S.sortDir===-1?'↓':'↑'):''}</button>
+                            <button class="filter-btn ${S.sort==='ctr'?'active':''}" onclick="setSort('ctr')">CTR ${S.sort==='ctr'?(S.sortDir===-1?'↓':'↑'):''}</button>
+                        </div>
+                    </div>
                     <div class="panel-body flush">
                         <div class="table-wrap">
                             <table>
                                 <thead>
                                     <tr>
+                                        <th class="check-cell"><input type="checkbox" title="Выбрать все" onchange="(function(cb){if(cb.checked){sortedSites().forEach(s=>S.selected.add(s.site_url));}else{sortedSites().forEach(s=>S.selected.delete(s.site_url));}render();})(this)"></th>
                                         <th onclick="setSort('site_url')">Сайт</th>
                                         <th onclick="setSort('clicks')">Клики ${sortArrow('clicks')}</th>
                                         <th onclick="setSort('impressions')">Показы ${sortArrow('impressions')}</th>
                                         <th onclick="setSort('position')">Позиция ${sortArrow('position')}</th>
                                         <th onclick="setSort('ctr')">CTR ${sortArrow('ctr')}</th>
+                                        <th>Изм.%</th>
                                         <th>Тренд (28д)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     ${sites.map((s, i) => `
-                                        <tr class="clickable" data-url="${shortUrl(s.site_url).toLowerCase()}" onclick="openSite('${s.site_url.replace(/'/g, "\\'")}')">
+                                        <tr class="clickable ${S.selected.has(s.site_url)?'selected-row':''}" data-url="${shortUrl(s.site_url).toLowerCase()}" data-siteurl="${s.site_url.replace(/"/g,'&quot;')}" onclick="openSite('${s.site_url.replace(/'/g, "\\'")}')">
+                                            <td class="check-cell" onclick="event.stopPropagation()">
+                                                <input type="checkbox" data-cmp="${s.site_url.replace(/"/g,'&quot;')}" ${S.selected.has(s.site_url)?'checked':''} onchange="toggleSelect('${s.site_url.replace(/'/g,"\\'")}',event)">
+                                            </td>
                                             <td>
                                                 <div class="site-cell">
                                                     <div class="site-dot ${status(s)}"></div>
@@ -1008,6 +1210,7 @@ function render() {
                                             <td class="mono">${fmt(s.impressions)}</td>
                                             <td class="mono">${(s.position||0).toFixed(1)}</td>
                                             <td class="mono">${((s.ctr||0)*100).toFixed(2)}%</td>
+                                            <td class="mono trend ${(s.clicks_change||0)>=0?'up':'down'}" style="font-size:11px">${(s.clicks_change||0)>=0?'+':''}${(s.clicks_change||0).toFixed(1)}%</td>
                                             <td><canvas class="spark" id="spark${i}"></canvas></td>
                                         </tr>
                                     `).join('')}
@@ -1022,6 +1225,12 @@ function render() {
                 </div>
             </div>
         </main>
+
+        <div id="compare-bar" class="compare-bar ${S.selected.size >= 2 ? 'visible' : ''}">
+            <span style="color:var(--text);font-size:13px">Выбрано: <b class="cmp-count">${S.selected.size}</b> сайт(а)</span>
+            <button class="compare-bar-btn primary" onclick="openComparison()">📊 Сравнить</button>
+            <button class="compare-bar-btn secondary" onclick="clearSelection()">✕ Сбросить</button>
+        </div>
     `;
 
     setTimeout(() => {

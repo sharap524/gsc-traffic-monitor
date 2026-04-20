@@ -8,309 +8,78 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #0a0a0f;
-            --card: #12121a;
-            --border: #1e1e2e;
-            --text: #e5e7eb;
-            --muted: #6b7280;
-            --green: #10b981;
-            --red: #ef4444;
-            --blue: #3b82f6;
-            --purple: #8b5cf6;
-            --yellow: #f59e0b;
-            --cyan: #06b6d4;
+            --bg: #0a0a0f; --card: #12121a; --border: #1e1e2e;
+            --text: #e5e7eb; --muted: #6b7280;
+            --green: #10b981; --red: #ef4444; --blue: #3b82f6;
+            --purple: #8b5cf6; --yellow: #f59e0b; --cyan: #06b6d4;
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            font-size: 13px;
-        }
-
-        .header {
-            background: linear-gradient(180deg, #16161f 0%, var(--bg) 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 13px; }
+        .header { background: linear-gradient(180deg, #16161f 0%, var(--bg) 100%); border-bottom: 1px solid var(--border); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; cursor: pointer; }
         .logo:hover { opacity: 0.8; }
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--green), var(--cyan));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        .header-right {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            font-size: 12px;
-            color: var(--muted);
-        }
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--green);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        .stale-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--yellow);
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--green), var(--cyan)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .header-right { display: flex; gap: 20px; align-items: center; font-size: 12px; color: var(--muted); }
+        .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; display: inline-block; margin-right: 6px; }
+        .stale-dot { width: 8px; height: 8px; background: var(--yellow); border-radius: 50%; display: inline-block; margin-right: 6px; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
         .main { padding: 20px 24px; }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .stat {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-        }
-        .stat-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
+        .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+        .stat { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; }
+        .stat-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
         .stat-icon { font-size: 24px; }
-        .stat-change {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
+        .stat-change { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px; }
         .stat-change.up { background: rgba(16,185,129,0.15); color: var(--green); }
         .stat-change.down { background: rgba(239,68,68,0.15); color: var(--red); }
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-        .stat-label {
-            font-size: 11px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stat-sub {
-            font-size: 10px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .grid-wide {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-        .grid-4 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .panel {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-        .panel-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .panel-title {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .stat-value { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+        .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+        .grid-wide { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; margin-bottom: 20px; }
+        .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+        .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .panel-body { padding: 20px; }
         .panel-body.flush { padding: 0; }
-
         .chart-box { height: 220px; }
         .chart-box.sm { height: 200px; }
         .chart-box.lg { height: 280px; }
-
-        .legend {
-            display: flex;
-            gap: 16px;
-            font-size: 11px;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 3px;
-        }
-
-        .search-input {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            width: 220px;
-        }
+        .legend { display: flex; gap: 16px; font-size: 11px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+        .search-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 14px; border-radius: 8px; font-size: 12px; width: 220px; }
         .search-input:focus { outline: none; border-color: var(--blue); }
-
-        .table-wrap {
-            max-height: 500px;
-            overflow-y: auto;
-            overflow-x: auto;
-        }
+        .table-wrap { max-height: 500px; overflow-y: auto; overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
-        th {
-            text-align: left;
-            padding: 12px 20px;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--muted);
-            background: rgba(0,0,0,0.4);
-            position: sticky;
-            top: 0;
-            cursor: pointer;
-            user-select: none;
-        }
+        th { text-align: left; padding: 12px 20px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); background: rgba(0,0,0,0.4); position: sticky; top: 0; cursor: pointer; user-select: none; }
         th:hover { color: var(--text); }
         th .sort-arrow { font-size: 9px; margin-left: 2px; }
-        td {
-            padding: 14px 20px;
-            border-bottom: 1px solid var(--border);
-        }
+        td { padding: 14px 20px; border-bottom: 1px solid var(--border); }
         tr.clickable { cursor: pointer; }
         tr.clickable:hover { background: rgba(59,130,246,0.06); }
         tr:last-child td { border-bottom: none; }
-
-        .site-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .site-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
+        .site-cell { display: flex; align-items: center; gap: 12px; }
+        .site-dot { width: 8px; height: 8px; border-radius: 50%; }
         .site-dot.good { background: var(--green); }
         .site-dot.warn { background: var(--yellow); }
         .site-dot.bad { background: var(--red); }
-        .site-name {
-            font-weight: 500;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .mono {
-            font-family: 'SF Mono', Consolas, monospace;
-            font-size: 12px;
-        }
+        .site-name { font-weight: 500; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mono { font-family: 'SF Mono', Consolas, monospace; font-size: 12px; }
         .trend { font-weight: 600; }
         .trend.up { color: var(--green); }
         .trend.down { color: var(--red); }
         .spark { width: 120px; height: 24px; }
-
-        .toggle-btn {
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--muted);
-            transition: all 0.2s;
-        }
-        .toggle-btn.active {
-            background: color-mix(in srgb, var(--tc) 20%, transparent);
-            color: var(--tc);
-            border-color: color-mix(in srgb, var(--tc) 40%, transparent);
-        }
+        .toggle-btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all 0.2s; }
+        .toggle-btn.active { background: color-mix(in srgb, var(--tc) 20%, transparent); color: var(--tc); border-color: color-mix(in srgb, var(--tc) 40%, transparent); }
         .toggle-btn:hover { border-color: var(--tc); }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            cursor: pointer;
-            font-size: 13px;
-            margin-bottom: 16px;
-            transition: border-color 0.2s;
-        }
+        .back-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); cursor: pointer; font-size: 13px; margin-bottom: 16px; transition: border-color 0.2s; }
         .back-btn:hover { border-color: var(--blue); }
-
-        .detail-header {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-        .detail-title {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .detail-badge {
-            font-size: 12px;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-weight: 600;
-        }
+        .detail-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+        .detail-title { font-size: 22px; font-weight: 700; }
+        .detail-badge { font-size: 12px; padding: 4px 12px; border-radius: 6px; font-weight: 600; }
         .detail-badge.up { background: rgba(16,185,129,0.15); color: var(--green); }
         .detail-badge.down { background: rgba(239,68,68,0.15); color: var(--red); }
 
+        /* Main filter bar */
         .filter-bar { display:flex; gap:12px; padding:10px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap; align-items:center; background:rgba(255,255,255,0.01); }
         .filter-group { display:flex; align-items:center; gap:5px; }
         .filter-label { font-size:11px; color:var(--muted); white-space:nowrap; margin-right:2px; }
@@ -318,27 +87,46 @@
         .filter-btn.active { background:rgba(59,130,246,0.15); color:var(--blue); border-color:rgba(59,130,246,0.4); }
         .filter-btn:hover { border-color:var(--blue); color:var(--text); }
 
+        /* Detail filter panel */
+        .fp { background:rgba(255,255,255,0.015); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+        .fp-group { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+        .fp-label { font-size:11px; color:var(--muted); white-space:nowrap; }
+        .fp-btn { padding:3px 10px; border-radius:5px; font-size:11px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; white-space:nowrap; }
+        .fp-btn:hover { border-color:var(--blue); }
+        .fp-btn.active { background:rgba(59,130,246,0.15); color:var(--blue); border-color:rgba(59,130,246,0.4); }
+        .fp-btn.g.active { background:rgba(16,185,129,0.15); color:var(--green); border-color:rgba(16,185,129,0.4); }
+        .fp-btn.y.active { background:rgba(245,158,11,0.15); color:var(--yellow); border-color:rgba(245,158,11,0.4); }
+        .fp-inp { background:var(--bg); border:1px solid var(--border); color:var(--text); padding:3px 8px; border-radius:5px; font-size:11px; }
+        .fp-inp:focus { outline:none; border-color:var(--blue); }
+        .fp-sep { width:1px; height:20px; background:var(--border); flex-shrink:0; }
+        .fp-reset { padding:3px 10px; border-radius:5px; font-size:11px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+        .fp-reset:hover { border-color:var(--red); color:var(--red); }
+        .fp-count { font-size:11px; color:var(--muted); white-space:nowrap; }
+        .export-btn { padding:4px 12px; border-radius:5px; font-size:11px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+        .export-btn:hover { border-color:var(--green); color:var(--green); }
+
+        /* Compare */
         .compare-bar { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(120px); background:#1a1a2e; border:1px solid var(--blue); border-radius:12px; padding:12px 20px; display:flex; align-items:center; gap:12px; box-shadow:0 8px 32px rgba(0,0,0,0.5); transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1); z-index:200; white-space:nowrap; }
         .compare-bar.visible { transform:translateX(-50%) translateY(0); }
         .compare-bar-btn { padding:7px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:opacity 0.2s; }
         .compare-bar-btn.primary { background:var(--blue); color:#fff; }
         .compare-bar-btn.secondary { background:transparent; border:1px solid var(--border); color:var(--muted); }
         .compare-bar-btn:hover { opacity:0.8; }
-
         .check-cell { width:36px !important; padding:0 10px !important; }
         .check-cell input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var(--blue); }
         tr.selected-row { background:rgba(59,130,246,0.06) !important; }
-
         .compare-chip { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:12px; font-weight:600; }
         .cmp-metric-btn { padding:5px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
         .cmp-metric-btn.active { background:rgba(59,130,246,0.15); color:var(--blue); border-color:rgba(59,130,246,0.4); }
+        .cmp-tab { padding:5px 14px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+        .cmp-tab.active { background:rgba(59,130,246,0.15); color:var(--blue); border-color:rgba(59,130,246,0.4); }
+        .dev-btn { padding:4px 12px; border-radius:5px; font-size:12px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+        .dev-btn.active { background:rgba(6,182,212,0.15); color:var(--cyan); border-color:rgba(6,182,212,0.4); }
+        .dev-btn:hover { border-color:var(--cyan); }
 
-        .detail-tabs { display: flex; gap: 4px; }
-        .detail-tab {
-            padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
-            cursor: pointer; border: 1px solid var(--border); background: transparent;
-            color: var(--muted); transition: all 0.2s;
-        }
+        /* Detail tabs */
+        .detail-tabs { display: flex; gap: 4px; flex-wrap:wrap; }
+        .detail-tab { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--muted); transition: all 0.2s; }
         .detail-tab.active { background: rgba(59,130,246,0.15); color: var(--blue); border-color: rgba(59,130,246,0.4); }
         .detail-tab:hover { border-color: var(--blue); }
 
@@ -346,78 +134,51 @@
         .geo-bar { height: 6px; background: var(--blue); border-radius: 3px; min-width: 2px; transition: width 0.3s; }
         .tab-empty { padding: 40px; text-align: center; color: var(--muted); }
         .tab-loading { padding: 40px; text-align: center; color: var(--muted); }
-        th.sortable { cursor: pointer; user-select: none; }
-        th.sortable:hover { color: var(--text); }
+        .device-pills { display:flex; gap:8px; padding:12px 16px; border-bottom:1px solid var(--border); }
+        .device-pill { flex:1; text-align:center; padding:12px; border-radius:8px; border:1px solid var(--border); }
+        .device-pill-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+        .device-pill-val { font-size:20px; font-weight:700; }
+        .device-pill-sub { font-size:10px; color:var(--muted); margin-top:2px; }
+        .pos-badge { display:inline-block; padding:2px 7px; border-radius:4px; font-size:11px; font-weight:600; }
+        .pos-1 { background:rgba(16,185,129,0.15); color:var(--green); }
+        .pos-10 { background:rgba(59,130,246,0.15); color:var(--blue); }
+        .pos-20 { background:rgba(245,158,11,0.15); color:var(--yellow); }
+        .pos-bad { background:rgba(239,68,68,0.1); color:var(--muted); }
 
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            gap: 16px;
-        }
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border);
-            border-top-color: var(--green);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; gap: 16px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--muted);
-        }
+        .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
         .empty-icon { font-size: 48px; margin-bottom: 16px; }
-
-        .warn-banner {
-            background: rgba(245,158,11,0.1);
-            border: 1px solid rgba(245,158,11,0.3);
-            border-radius: 8px;
-            padding: 10px 16px;
-            margin-bottom: 16px;
-            font-size: 12px;
-            color: var(--yellow);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        @media (max-width: 1200px) {
-            .stats { grid-template-columns: repeat(3, 1fr); }
-            .grid, .grid-wide, .grid-4 { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .header { flex-direction: column; gap: 12px; }
-        }
+        .warn-banner { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); border-radius: 8px; padding: 10px 16px; margin-bottom: 16px; font-size: 12px; color: var(--yellow); display: flex; align-items: center; gap: 8px; }
+        @media (max-width: 1200px) { .stats { grid-template-columns: repeat(3, 1fr); } .grid, .grid-wide { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .stats { grid-template-columns: repeat(2, 1fr); } .header { flex-direction: column; gap: 12px; } }
     </style>
 </head>
 <body>
 <div id="app"><div class="loading"><div class="spinner"></div><div style="color:var(--muted)">Загрузка...</div></div></div>
-
 <script>
 const API = 'https://puxnigzdbscstvjlyvbg.supabase.co/rest/v1';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1eG5pZ3pkYnNjc3R2amx5dmJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzMxNDIsImV4cCI6MjA5MTMwOTE0Mn0.fxNYsN9ZlXIoJSbQdflKLSP7w-69TY4r8AP3biZsdmY';
 
 let D = { sites: [], daily: [] };
-let S = { sort: 'clicks', sortDir: -1, search: '', view: 'overview', selectedSite: null, selected: new Set(), statusFilter: '', compareMetric: 'clicks' };
+let S = { sort: 'clicks', sortDir: -1, search: '', view: 'overview', selectedSite: null, selected: new Set(), statusFilter: '', compareMetric: 'clicks', compareTab: 'chart', compareDevice: '' };
 
+// Detail filter state
+let F = { preset: '', posMin: '', posMax: '', search: '', minClicks: '', minImpressions: '' };
+let tabData = {}; // cache per tab
+let detailVisible = { clicks: true, impressions: true, position: false, ctr: false };
+let detailTab = 'overview';
+
+// ─── API ────────────────────────────────────────────────────────────────────
 const q = async (table, params='') => {
     try {
-        const r = await fetch(`${API}/${table}?${params}`, {
-            headers: { apikey: KEY, Authorization: `Bearer ${KEY}` }
-        });
+        const r = await fetch(`${API}/${table}?${params}`, { headers: { apikey: KEY, Authorization: `Bearer ${KEY}` } });
         return r.ok ? await r.json() : [];
     } catch(e) { console.error(e); return []; }
 };
 
 async function qAll(table, params='') {
-    // Supabase ограничивает 1000 строк за запрос — загружаем всё пагинацией
     let all = [], offset = 0, batch = 1000;
     while (true) {
         const sep = params ? '&' : '';
@@ -432,42 +193,30 @@ async function qAll(table, params='') {
 async function load() {
     const latestSites = await q('traffic_sites', 'select=date&order=date.desc&limit=1');
     const latestDate = latestSites?.[0]?.date;
-
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 60);
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 60);
     const cutoffStr = cutoff.toISOString().split('T')[0];
-
-    const sitesParams = latestDate
-        ? `date=eq.${latestDate}&order=clicks.desc&limit=200`
-        : 'order=clicks.desc&limit=200';
-
+    const sitesParams = latestDate ? `date=eq.${latestDate}&order=clicks.desc&limit=200` : 'order=clicks.desc&limit=200';
     const [sites, daily] = await Promise.all([
         q('traffic_sites', sitesParams),
         qAll('traffic_daily', `date=gte.${cutoffStr}&order=date.asc`)
     ]);
     D.sites = sites || [];
     D.daily = daily || [];
-
     const dates = [...new Set(D.daily.map(d => d.date))].sort();
     D.lastDate = dates[dates.length - 1];
     D.firstDate = dates[0];
     D.latestSiteDate = latestDate;
-
-    console.log('Loaded:', D.sites.length, 'sites,', D.daily.length, 'daily rows, date:', latestDate);
 }
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
 const shortUrl = u => u?.replace(/https?:\/\//, '').replace('sc-domain:', '').replace(/\/$/, '') || '';
-const fmt = n => {
-    if (n === null || n === undefined) return '—';
-    if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
-    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
-    if (n >= 1e3) return (n/1e3).toFixed(1) + 'K';
-    return Math.round(n).toLocaleString();
-};
-const fmtDate = d => {
-    const dt = new Date(d);
-    return `${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,'0')}`;
-};
+const fmt = n => { if (n === null || n === undefined) return '—'; if (n >= 1e9) return (n/1e9).toFixed(1)+'B'; if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(1)+'K'; return Math.round(n).toLocaleString(); };
+const fmtDate = d => { const dt = new Date(d); return `${dt.getDate()}.${String(dt.getMonth()+1).padStart(2,'0')}`; };
+
+function posBadge(p) {
+    const cls = p <= 3 ? 'pos-1' : p <= 10 ? 'pos-10' : p <= 20 ? 'pos-20' : 'pos-bad';
+    return `<span class="pos-badge ${cls}">${p.toFixed(1)}</span>`;
+}
 
 function stats() {
     const clicks = D.sites.reduce((s, x) => s + (x.clicks || 0), 0);
@@ -488,236 +237,65 @@ function dailyTotals() {
         byDate[d.date].ctr += d.ctr || 0;
         byDate[d.date].n++;
     });
-    return Object.values(byDate)
-        .map(d => ({ ...d, position: d.n ? d.position / d.n : 0, ctr: d.n ? d.ctr / d.n : 0 }))
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
+    return Object.values(byDate).map(d => ({ ...d, position: d.n ? d.position/d.n : 0, ctr: d.n ? d.ctr/d.n : 0 })).sort((a,b) => new Date(a.date)-new Date(b.date));
 }
 
-function siteDaily(url) {
-    return D.daily.filter(d => d.site_url === url).sort((a, b) => new Date(a.date) - new Date(b.date));
-}
-
-function siteDailyShort(url) {
-    return siteDaily(url).slice(-28);
-}
-
-function status(s) {
-    if ((s.clicks_change || 0) < -30) return 'bad';
-    if ((s.clicks_change || 0) < -10) return 'warn';
-    return 'good';
-}
-
-function isDataStale() {
-    if (!D.lastDate) return false;
-    const last = new Date(D.lastDate);
-    const now = new Date();
-    const diffDays = Math.floor((now - last) / (1000 * 60 * 60 * 24));
-    return diffDays > 5;
-}
-
-function staleDays() {
-    if (!D.lastDate) return 0;
-    const last = new Date(D.lastDate);
-    const now = new Date();
-    return Math.floor((now - last) / (1000 * 60 * 60 * 24));
-}
-
-let charts = {};
-let sparkCharts = [];
-
-function destroyAllCharts() {
-    Object.values(charts).forEach(c => { if (c) c.destroy(); });
-    charts = {};
-    sparkCharts.forEach(c => c.destroy());
-    sparkCharts = [];
-}
-
-function makeChart(canvasId, config) {
-    const el = document.getElementById(canvasId);
-    if (!el) return;
-    if (charts[canvasId]) charts[canvasId].destroy();
-    charts[canvasId] = new Chart(el, config);
-}
-
-const chartDefaults = {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { intersect: false, mode: 'index' },
-    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e1e2e', padding: 12, titleFont: { size: 11 }, bodyFont: { size: 11 } } }
-};
-
-function drawOverviewCharts() {
-    const daily = dailyTotals();
-    if (!daily.length) return;
-    const labels = daily.map(d => fmtDate(d.date));
-
-    makeChart('chartTraffic', {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [
-                { label: 'Клики', data: daily.map(d => d.clicks), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 },
-                { label: 'Показы', data: daily.map(d => d.impressions), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.05)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, yAxisID: 'y1' }
-            ]
-        },
-        options: {
-            ...chartDefaults,
-            scales: {
-                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 15 } },
-                y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#3b82f6', font: { size: 10 }, callback: v => fmt(v) } },
-                y1: { position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#8b5cf6', font: { size: 10 }, callback: v => fmt(v) } }
-            }
-        }
-    });
-
-    const top = D.sites.slice(0, 8);
-    if (top.length) {
-        makeChart('chartTop', {
-            type: 'bar',
-            data: {
-                labels: top.map(s => shortUrl(s.site_url).substring(0, 14)),
-                datasets: [{ data: top.map(s => s.clicks), backgroundColor: ['#3b82f6','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#6366f1'], borderRadius: 6 }]
-            },
-            options: {
-                indexAxis: 'y', ...chartDefaults,
-                scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, callback: v => fmt(v) } },
-                    y: { grid: { display: false }, ticks: { color: '#e5e7eb', font: { size: 10 } } }
-                }
-            }
-        });
-    }
-}
-
-// Состояние видимости метрик в детальном графике
-let detailVisible = { clicks: true, impressions: true, position: false, ctr: false };
-let detailTab = 'overview';
+function siteDaily(url) { return D.daily.filter(d => d.site_url === url).sort((a,b) => new Date(a.date)-new Date(b.date)); }
+function siteDailyShort(url) { return siteDaily(url).slice(-28); }
+function status(s) { if ((s.clicks_change||0) < -30) return 'bad'; if ((s.clicks_change||0) < -10) return 'warn'; return 'good'; }
+function isDataStale() { if (!D.lastDate) return false; return Math.floor((new Date()-new Date(D.lastDate))/(1000*60*60*24)) > 5; }
+function staleDays() { if (!D.lastDate) return 0; return Math.floor((new Date()-new Date(D.lastDate))/(1000*60*60*24)); }
 
 // ISO 3166-1 alpha-3 → flag emoji
 function countryFlag(code) {
     if (!code) return '🌍';
-    const map = {
-        'USA':'US','GBR':'GB','RUS':'RU','DEU':'DE','FRA':'FR','CHN':'CN','JPN':'JP',
-        'IND':'IN','BRA':'BR','CAN':'CA','AUS':'AU','ITA':'IT','ESP':'ES','KOR':'KR',
-        'NLD':'NL','TUR':'TR','MEX':'MX','ARG':'AR','POL':'PL','UKR':'UA','IDN':'ID',
-        'THA':'TH','VNM':'VN','PHL':'PH','MYS':'MY','SGP':'SG','NGA':'NG','ZAF':'ZA',
-        'EGY':'EG','SAU':'SA','PAK':'PK','BGD':'BD','ISR':'IL','CHE':'CH','SWE':'SE',
-        'NOR':'NO','DNK':'DK','FIN':'FI','BEL':'BE','AUT':'AT','PRT':'PT','GRC':'GR',
-        'CZE':'CZ','HUN':'HU','ROU':'RO','BGR':'BG','HRV':'HR','SVK':'SK','SVN':'SI',
-        'KAZ':'KZ','BLR':'BY','UZB':'UZ','IRN':'IR','IRQ':'IQ','ARE':'AE','QAT':'QA',
-        'COL':'CO','CHL':'CL','PER':'PE','VEN':'VE','ECU':'EC','CIV':'CI','GHA':'GH',
-        'KEN':'KE','ETH':'ET','TZA':'TZ','MAR':'MA','DZA':'DZ','TUN':'TN','LBY':'LY',
-        'NZL':'NZ','HKG':'HK','TWN':'TW','MMR':'MM','KHM':'KH','LKA':'LK','NPL':'NP'
-    };
+    const map = {'USA':'US','GBR':'GB','RUS':'RU','DEU':'DE','FRA':'FR','CHN':'CN','JPN':'JP','IND':'IN','BRA':'BR','CAN':'CA','AUS':'AU','ITA':'IT','ESP':'ES','KOR':'KR','NLD':'NL','TUR':'TR','MEX':'MX','ARG':'AR','POL':'PL','UKR':'UA','IDN':'ID','THA':'TH','VNM':'VN','PHL':'PH','MYS':'MY','SGP':'SG','NGA':'NG','ZAF':'ZA','EGY':'EG','SAU':'SA','PAK':'PK','BGD':'BD','ISR':'IL','CHE':'CH','SWE':'SE','NOR':'NO','DNK':'DK','FIN':'FI','BEL':'BE','AUT':'AT','PRT':'PT','GRC':'GR','CZE':'CZ','HUN':'HU','ROU':'RO','BGR':'BG','HRV':'HR','SVK':'SK','SVN':'SI','KAZ':'KZ','BLR':'BY','UZB':'UZ','IRN':'IR','IRQ':'IQ','ARE':'AE','QAT':'QA','COL':'CO','CHL':'CL','PER':'PE','VEN':'VE','ECU':'EC','NZL':'NZ','HKG':'HK','TWN':'TW'};
     const iso2 = map[code.toUpperCase()];
     if (!iso2) return '🌍';
     return String.fromCodePoint(...[...iso2].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
 }
 
-async function switchDetailTab(tab) {
-    detailTab = tab;
-    document.querySelectorAll('.detail-tab').forEach(t =>
-        t.classList.toggle('active', t.dataset.tab === tab));
-    const controls = document.getElementById('tab-controls');
-    const content = document.getElementById('detail-tab-content');
-    if (tab === 'overview') {
-        controls.style.display = 'flex';
-        content.innerHTML = '<div style="height:400px"><canvas id="detailChart"></canvas></div>';
-        setTimeout(() => drawDetailChart(S.selectedSite), 50);
-    } else {
-        controls.style.display = 'none';
-        if (tab === 'keywords') await loadKeywordsTab(S.selectedSite);
-        else if (tab === 'geo') await loadGeoTab(S.selectedSite);
-    }
-}
+// ─── Charts ─────────────────────────────────────────────────────────────────
+let charts = {}, sparkCharts = [];
+function destroyAllCharts() { Object.values(charts).forEach(c => { if(c) c.destroy(); }); charts = {}; sparkCharts.forEach(c => c.destroy()); sparkCharts = []; }
+const chartDefaults = { responsive: true, maintainAspectRatio: false, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e1e2e', padding: 12, titleFont: { size: 11 }, bodyFont: { size: 11 } } } };
 
-async function loadKeywordsTab(siteUrl) {
-    const content = document.getElementById('detail-tab-content');
-    content.innerHTML = '<div class="tab-loading">⏳ Загрузка ключевых слов...</div>';
-    const data = await q('traffic_keywords',
-        `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=200`);
-    if (!data || !data.length) {
-        content.innerHTML = '<div class="tab-empty">Нет данных по ключевым словам.<br>Запустите сбор данных для обновления.</div>';
-        return;
+function drawOverviewCharts() {
+    const daily = dailyTotals();
+    if (!daily.length) return;
+    const labels = daily.map(d => fmtDate(d.date));
+    charts.chartTraffic && charts.chartTraffic.destroy();
+    const el = document.getElementById('chartTraffic');
+    if (!el) return;
+    charts.chartTraffic = new Chart(el, {
+        type: 'line',
+        data: { labels, datasets: [
+            { label: 'Клики', data: daily.map(d => d.clicks), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 },
+            { label: 'Показы', data: daily.map(d => d.impressions), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.05)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0, yAxisID: 'y1' }
+        ]},
+        options: { ...chartDefaults, scales: { x: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6b7280',font:{size:10},maxTicksLimit:15} }, y: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#3b82f6',font:{size:10},callback:v=>fmt(v)} }, y1: { position:'right', grid:{drawOnChartArea:false}, ticks:{color:'#8b5cf6',font:{size:10},callback:v=>fmt(v)} } } }
+    });
+    const top = D.sites.slice(0, 8);
+    if (top.length) {
+        const el2 = document.getElementById('chartTop');
+        if (!el2) return;
+        charts.chartTop = new Chart(el2, {
+            type: 'bar',
+            data: { labels: top.map(s => shortUrl(s.site_url).substring(0,14)), datasets: [{ data: top.map(s => s.clicks), backgroundColor: ['#3b82f6','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#6366f1'], borderRadius: 6 }] },
+            options: { indexAxis:'y', ...chartDefaults, scales: { x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',font:{size:10},callback:v=>fmt(v)}}, y:{grid:{display:false},ticks:{color:'#e5e7eb',font:{size:10}}} } }
+        });
     }
-    content.innerHTML = `
-        <div class="table-wrap" style="max-height:480px">
-            <table>
-                <thead><tr>
-                    <th>Запрос</th>
-                    <th class="mono" style="text-align:right">Клики</th>
-                    <th class="mono" style="text-align:right">Показы</th>
-                    <th class="mono" style="text-align:right">Позиция</th>
-                    <th class="mono" style="text-align:right">CTR</th>
-                </tr></thead>
-                <tbody>
-                    ${data.map(r => `<tr>
-                        <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.query}</td>
-                        <td class="mono" style="text-align:right">${fmt(r.clicks)}</td>
-                        <td class="mono" style="text-align:right">${fmt(r.impressions)}</td>
-                        <td class="mono" style="text-align:right">${(r.position||0).toFixed(1)}</td>
-                        <td class="mono" style="text-align:right">${((r.ctr||0)*100).toFixed(2)}%</td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-        </div>`;
-}
-
-async function loadGeoTab(siteUrl) {
-    const content = document.getElementById('detail-tab-content');
-    content.innerHTML = '<div class="tab-loading">⏳ Загрузка географии...</div>';
-    const data = await q('traffic_geo',
-        `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=100`);
-    if (!data || !data.length) {
-        content.innerHTML = '<div class="tab-empty">Нет данных по географии.<br>Запустите сбор данных для обновления.</div>';
-        return;
-    }
-    const maxClicks = data[0].clicks || 1;
-    content.innerHTML = `
-        <div class="table-wrap" style="max-height:480px">
-            <table>
-                <thead><tr>
-                    <th>Страна</th>
-                    <th class="mono" style="text-align:right">Клики</th>
-                    <th class="mono" style="text-align:right">Показы</th>
-                    <th class="mono" style="text-align:right">Позиция</th>
-                    <th class="mono" style="text-align:right">CTR</th>
-                    <th style="min-width:120px">Доля кликов</th>
-                </tr></thead>
-                <tbody>
-                    ${data.map(r => `<tr>
-                        <td>${countryFlag(r.country)} ${r.country}</td>
-                        <td class="mono" style="text-align:right">${fmt(r.clicks)}</td>
-                        <td class="mono" style="text-align:right">${fmt(r.impressions)}</td>
-                        <td class="mono" style="text-align:right">${(r.position||0).toFixed(1)}</td>
-                        <td class="mono" style="text-align:right">${((r.ctr||0)*100).toFixed(2)}%</td>
-                        <td><div class="geo-bar-wrap"><div class="geo-bar" style="width:${Math.round((r.clicks/maxClicks)*100)}px"></div><span style="font-size:10px;color:var(--muted)">${Math.round(r.clicks/maxClicks*100)}%</span></div></td>
-                    </tr>`).join('')}
-                </tbody>
-            </table>
-        </div>`;
 }
 
 function toggleMetric(key) {
     detailVisible[key] = !detailVisible[key];
-    // Обновляем кнопки
-    document.querySelectorAll('.toggle-btn').forEach(btn => {
-        const k = btn.dataset.metric;
-        btn.classList.toggle('active', detailVisible[k]);
-    });
-    // Обновляем видимость datasets
+    document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.toggle('active', detailVisible[btn.dataset.metric]));
     if (charts.detailChart) {
-        const map = { clicks: 0, impressions: 1, position: 2, ctr: 3 };
-        Object.entries(map).forEach(([k, idx]) => {
-            const meta = charts.detailChart.getDatasetMeta(idx);
-            meta.hidden = !detailVisible[k];
-        });
-        // Показываем/скрываем оси
-        const yAxes = charts.detailChart.options.scales;
-        yAxes.yClicks.display = detailVisible.clicks;
-        yAxes.yImpr.display = detailVisible.impressions;
-        yAxes.yPos.display = detailVisible.position;
-        yAxes.yCtr.display = detailVisible.ctr;
+        const map = { clicks:0, impressions:1, position:2, ctr:3 };
+        Object.entries(map).forEach(([k,idx]) => { charts.detailChart.getDatasetMeta(idx).hidden = !detailVisible[k]; });
+        const sc = charts.detailChart.options.scales;
+        sc.yClicks.display = detailVisible.clicks; sc.yImpr.display = detailVisible.impressions;
+        sc.yPos.display = detailVisible.position; sc.yCtr.display = detailVisible.ctr;
         charts.detailChart.update();
     }
 }
@@ -725,47 +303,26 @@ function toggleMetric(key) {
 function drawDetailChart(siteUrl) {
     const daily = siteDaily(siteUrl);
     if (!daily.length) return;
-    const labels = daily.map(d => fmtDate(d.date));
-
     const el = document.getElementById('detailChart');
     if (!el) return;
     if (charts.detailChart) charts.detailChart.destroy();
-
     charts.detailChart = new Chart(el, {
         type: 'line',
-        data: {
-            labels,
-            datasets: [
-                { label: 'Клики', data: daily.map(d => d.clicks), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yClicks', hidden: !detailVisible.clicks },
-                { label: 'Показы', data: daily.map(d => d.impressions), borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.08)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yImpr', hidden: !detailVisible.impressions },
-                { label: 'Позиция', data: daily.map(d => d.position), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', fill: false, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yPos', hidden: !detailVisible.position },
-                { label: 'CTR %', data: daily.map(d => (d.ctr * 100)), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.08)', fill: false, tension: 0.4, borderWidth: 2, pointRadius: 1, pointHoverRadius: 5, yAxisID: 'yCtr', hidden: !detailVisible.ctr }
-            ]
-        },
+        data: { labels: daily.map(d => fmtDate(d.date)), datasets: [
+            { label:'Клики', data:daily.map(d=>d.clicks), borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', fill:true, tension:0.4, borderWidth:2, pointRadius:1, pointHoverRadius:5, yAxisID:'yClicks', hidden:!detailVisible.clicks },
+            { label:'Показы', data:daily.map(d=>d.impressions), borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.08)', fill:true, tension:0.4, borderWidth:2, pointRadius:1, pointHoverRadius:5, yAxisID:'yImpr', hidden:!detailVisible.impressions },
+            { label:'Позиция', data:daily.map(d=>d.position), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', fill:false, tension:0.4, borderWidth:2, pointRadius:1, pointHoverRadius:5, yAxisID:'yPos', hidden:!detailVisible.position },
+            { label:'CTR %', data:daily.map(d=>d.ctr*100), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.08)', fill:false, tension:0.4, borderWidth:2, pointRadius:1, pointHoverRadius:5, yAxisID:'yCtr', hidden:!detailVisible.ctr }
+        ]},
         options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { intersect: false, mode: 'index' },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    backgroundColor: '#1e1e2e', padding: 14, titleFont: { size: 12 }, bodyFont: { size: 12 },
-                    callbacks: {
-                        label: ctx => {
-                            const lbl = ctx.dataset.label;
-                            const v = ctx.raw;
-                            if (lbl === 'Позиция') return `${lbl}: ${v.toFixed(1)}`;
-                            if (lbl === 'CTR %') return `CTR: ${v.toFixed(2)}%`;
-                            return `${lbl}: ${fmt(v)}`;
-                        }
-                    }
-                }
-            },
+            responsive:true, maintainAspectRatio:false, interaction:{intersect:false,mode:'index'},
+            plugins: { legend:{display:false}, tooltip:{backgroundColor:'#1e1e2e',padding:14,titleFont:{size:12},bodyFont:{size:12}, callbacks:{label:ctx=>{ const l=ctx.dataset.label,v=ctx.raw; if(l==='Позиция') return `${l}: ${v.toFixed(1)}`; if(l==='CTR %') return `CTR: ${v.toFixed(2)}%`; return `${l}: ${fmt(v)}`; }}} },
             scales: {
-                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 15 } },
-                yClicks: { display: detailVisible.clicks, position: 'left', grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#3b82f6', font: { size: 10 }, callback: v => fmt(v) } },
-                yImpr: { display: detailVisible.impressions, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#8b5cf6', font: { size: 10 }, callback: v => fmt(v) } },
-                yPos: { display: detailVisible.position, position: 'left', reverse: true, grid: { drawOnChartArea: false }, ticks: { color: '#f59e0b', font: { size: 10 } } },
-                yCtr: { display: detailVisible.ctr, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#10b981', font: { size: 10 }, callback: v => v.toFixed(1) + '%' } }
+                x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',font:{size:10},maxTicksLimit:15}},
+                yClicks:{display:detailVisible.clicks,position:'left',grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#3b82f6',font:{size:10},callback:v=>fmt(v)}},
+                yImpr:{display:detailVisible.impressions,position:'right',grid:{drawOnChartArea:false},ticks:{color:'#8b5cf6',font:{size:10},callback:v=>fmt(v)}},
+                yPos:{display:detailVisible.position,position:'left',reverse:true,grid:{drawOnChartArea:false},ticks:{color:'#f59e0b',font:{size:10}}},
+                yCtr:{display:detailVisible.ctr,position:'right',grid:{drawOnChartArea:false},ticks:{color:'#10b981',font:{size:10},callback:v=>v.toFixed(1)+'%'}}
             }
         }
     });
@@ -774,284 +331,508 @@ function drawDetailChart(siteUrl) {
 function drawSparkline(canvas, data) {
     if (!canvas || data.length < 2) return;
     const up = data[data.length-1].clicks >= data[0].clicks;
-    const chart = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: data.map((_, i) => i),
-            datasets: [{ data: data.map(d => d.clicks), borderColor: up ? '#10b981' : '#ef4444', borderWidth: 1.5, pointRadius: 0, tension: 0.4 }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-            scales: { x: { display: false }, y: { display: false } }
-        }
-    });
-    sparkCharts.push(chart);
+    sparkCharts.push(new Chart(canvas, { type:'line', data:{ labels:data.map((_,i)=>i), datasets:[{data:data.map(d=>d.clicks),borderColor:up?'#10b981':'#ef4444',borderWidth:1.5,pointRadius:0,tension:0.4}] }, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}}} }));
 }
 
-function openSite(siteUrl) {
-    S.view = 'detail';
-    S.selectedSite = siteUrl;
-    render();
+// ─── Filters ─────────────────────────────────────────────────────────────────
+function applyFilters(data, searchKey = 'query') {
+    let d = [...data];
+    const posMin = parseFloat(F.posMin) || 0;
+    const posMax = parseFloat(F.posMax) || 0;
+    const minC = parseInt(F.minClicks) || 0;
+    const minI = parseInt(F.minImpressions) || 0;
+    if (F.preset === 'quickwin') d = d.filter(r => r.position >= 5 && r.position <= 20 && r.impressions >= 100);
+    else if (F.preset === 'highpot') d = d.filter(r => r.impressions >= 1000 && (r.ctr||0) < 0.05);
+    else if (F.preset === 'top3') d = d.filter(r => r.position <= 3);
+    if (posMin > 0) d = d.filter(r => r.position >= posMin);
+    if (posMax > 0) d = d.filter(r => r.position <= posMax);
+    if (minC > 0) d = d.filter(r => r.clicks >= minC);
+    if (minI > 0) d = d.filter(r => r.impressions >= minI);
+    if (F.search) d = d.filter(r => (r[searchKey]||'').toLowerCase().includes(F.search.toLowerCase()));
+    return d;
 }
 
-function goBack() {
-    S.view = 'overview';
-    S.selectedSite = null;
-    render();
+function setPreset(p) {
+    F.preset = F.preset === p ? '' : p;
+    refreshTab();
+    document.querySelectorAll('.fp-preset').forEach(b => b.classList.toggle('active', b.dataset.preset === F.preset));
 }
 
-function setSort(col) {
-    if (S.sort === col) S.sortDir *= -1;
-    else { S.sort = col; S.sortDir = -1; }
-    render();
+function resetFilters() {
+    F = { preset:'', posMin:'', posMax:'', search:'', minClicks:'', minImpressions:'' };
+    // Rerender filter panel
+    const fp = document.getElementById('filter-panel');
+    if (fp) fp.outerHTML = buildFilterPanel();
+    refreshTab();
 }
 
+function refreshTab() {
+    const t = detailTab;
+    if (t === 'keywords' && tabData.keywords) renderKeywordsContent(tabData.keywords);
+    else if (t === 'pages' && tabData.pages) renderPagesContent(tabData.pages);
+    else if (t === 'geo' && tabData.geo) renderGeoContent(tabData.geo);
+    else if (t === 'querypage' && tabData.querypage) renderQueryPageContent(tabData.querypage);
+    else if (t === 'devices' && tabData.devices) renderDevicesContent(tabData.devices);
+    updateFilterCount();
+}
+
+function updateFilterCount() {
+    const el = document.getElementById('fp-count');
+    if (el) { const active = [F.preset,F.posMin,F.posMax,F.search,F.minClicks,F.minImpressions].filter(Boolean).length; el.textContent = active ? `(${active} фильтр${active>1?'а':''})` : ''; }
+}
+
+function exportCSV(data, filename) {
+    if (!data || !data.length) return;
+    const keys = Object.keys(data[0]).filter(k => k !== 'id' && k !== 'site_url' && k !== 'created_at');
+    const rows = [keys.join(','), ...data.map(r => keys.map(k => { const v = r[k]; return typeof v === 'string' && v.includes(',') ? `"${v}"` : v ?? ''; }).join(','))];
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+function buildFilterPanel() {
+    return `<div id="filter-panel" class="fp">
+        <div class="fp-group">
+            <span class="fp-label">Пресет:</span>
+            <button class="fp-btn g fp-preset ${F.preset==='quickwin'?'active':''}" data-preset="quickwin" onclick="setPreset('quickwin')">⚡ Quick wins</button>
+            <button class="fp-btn y fp-preset ${F.preset==='highpot'?'active':''}" data-preset="highpot" onclick="setPreset('highpot')">🚀 Высокий потенциал</button>
+            <button class="fp-btn fp-preset ${F.preset==='top3'?'active':''}" data-preset="top3" onclick="setPreset('top3')">🏆 Топ-3</button>
+        </div>
+        <div class="fp-sep"></div>
+        <div class="fp-group">
+            <span class="fp-label">Позиция:</span>
+            <input class="fp-inp" style="width:55px" type="number" placeholder="от" value="${F.posMin}" oninput="F.posMin=this.value;refreshTab()">
+            <span style="color:var(--muted);font-size:11px">—</span>
+            <input class="fp-inp" style="width:55px" type="number" placeholder="до" value="${F.posMax}" oninput="F.posMax=this.value;refreshTab()">
+        </div>
+        <div class="fp-sep"></div>
+        <div class="fp-group">
+            <span class="fp-label">Поиск:</span>
+            <input class="fp-inp" style="width:150px" type="text" placeholder="запрос / страница..." value="${F.search}" oninput="F.search=this.value;refreshTab()">
+        </div>
+        <div class="fp-sep"></div>
+        <div class="fp-group">
+            <span class="fp-label">Мин. кликов:</span>
+            <input class="fp-inp" style="width:60px" type="number" placeholder="0" value="${F.minClicks}" oninput="F.minClicks=this.value;refreshTab()">
+            <span class="fp-label" style="margin-left:6px">показов:</span>
+            <input class="fp-inp" style="width:70px" type="number" placeholder="0" value="${F.minImpressions}" oninput="F.minImpressions=this.value;refreshTab()">
+        </div>
+        <div class="fp-sep"></div>
+        <button class="fp-reset" onclick="resetFilters()">✕ Сбросить</button>
+        <span id="fp-count" class="fp-count"></span>
+    </div>`;
+}
+
+// ─── Tab content renderers ────────────────────────────────────────────────────
+function tabTableHTML(id, data, cols) {
+    const site = S.selectedSite;
+    const tabName = detailTab;
+    const exportFn = `exportCSV(tabData['${tabName}'],'${shortUrl(site)}_${tabName}_${D.lastDate}.csv')`;
+    return `
+        <div style="display:flex;justify-content:flex-end;padding:8px 16px;border-bottom:1px solid var(--border)">
+            <button class="export-btn" onclick="${exportFn}">⬇ CSV</button>
+        </div>
+        <div class="table-wrap" style="max-height:460px">
+            <table>
+                <thead><tr>${cols.map(c=>`<th ${c.r?'style="text-align:right"':''}>${c.label}</th>`).join('')}</tr></thead>
+                <tbody>${data.map(r=>`<tr>${cols.map(c=>`<td ${c.r?'class="mono" style="text-align:right"':''}>${c.fn(r)}</td>`).join('')}</tr>`).join('')}</tbody>
+            </table>
+        </div>`;
+}
+
+function renderKeywordsContent(raw) {
+    const content = document.getElementById('detail-tab-content');
+    if (!content) return;
+    const data = applyFilters(raw, 'query');
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    content.innerHTML = tabTableHTML('kw', data, [
+        { label: 'Запрос', fn: r => `<span style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${r.query}</span>` },
+        { label: 'Клики', r:true, fn: r => fmt(r.clicks) },
+        { label: 'Показы', r:true, fn: r => fmt(r.impressions) },
+        { label: 'Позиция', r:true, fn: r => posBadge(r.position||0) },
+        { label: 'CTR', r:true, fn: r => ((r.ctr||0)*100).toFixed(2)+'%' }
+    ]);
+}
+
+function renderPagesContent(raw) {
+    const content = document.getElementById('detail-tab-content');
+    if (!content) return;
+    const data = applyFilters(raw, 'page');
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    content.innerHTML = tabTableHTML('pages', data, [
+        { label: 'Страница', fn: r => `<span style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;color:var(--blue)" title="${r.page}">${r.page.replace(/https?:\/\/[^/]+/,'')}</span>` },
+        { label: 'Клики', r:true, fn: r => fmt(r.clicks) },
+        { label: 'Показы', r:true, fn: r => fmt(r.impressions) },
+        { label: 'Позиция', r:true, fn: r => posBadge(r.position||0) },
+        { label: 'CTR', r:true, fn: r => ((r.ctr||0)*100).toFixed(2)+'%' }
+    ]);
+}
+
+function renderDevicesContent(raw) {
+    const content = document.getElementById('detail-tab-content');
+    if (!content) return;
+    if (!raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных по устройствам.</div>'; return; }
+    const total = raw.reduce((s,r) => s+(r.clicks||0), 0) || 1;
+    const devIcon = { DESKTOP:'🖥', MOBILE:'📱', TABLET:'⬜' };
+    const devColor = { DESKTOP:'var(--blue)', MOBILE:'var(--green)', TABLET:'var(--yellow)' };
+    content.innerHTML = `
+        <div class="device-pills">
+            ${raw.map(r => `<div class="device-pill" style="border-color:${devColor[r.device]||'var(--border)'}">
+                <div class="device-pill-label">${devIcon[r.device]||''} ${r.device}</div>
+                <div class="device-pill-val" style="color:${devColor[r.device]||'var(--text)'}">${fmt(r.clicks)}</div>
+                <div class="device-pill-sub">кликов · ${Math.round(r.clicks/total*100)}%</div>
+                <div class="device-pill-sub">${fmt(r.impressions)} показов · поз. ${(r.position||0).toFixed(1)}</div>
+            </div>`).join('')}
+        </div>
+        ${tabTableHTML('dev', raw, [
+            { label: 'Устройство', fn: r => `${devIcon[r.device]||''} ${r.device}` },
+            { label: 'Клики', r:true, fn: r => fmt(r.clicks) },
+            { label: 'Показы', r:true, fn: r => fmt(r.impressions) },
+            { label: 'Позиция', r:true, fn: r => posBadge(r.position||0) },
+            { label: 'CTR', r:true, fn: r => ((r.ctr||0)*100).toFixed(2)+'%' },
+            { label: 'Доля', r:true, fn: r => Math.round(r.clicks/total*100)+'%' }
+        ])}`;
+}
+
+function renderGeoContent(raw) {
+    const content = document.getElementById('detail-tab-content');
+    if (!content) return;
+    const data = applyFilters(raw, 'country');
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    const maxC = data[0].clicks || 1;
+    content.innerHTML = `
+        <div style="display:flex;justify-content:flex-end;padding:8px 16px;border-bottom:1px solid var(--border)">
+            <button class="export-btn" onclick="exportCSV(tabData['geo'],'${shortUrl(S.selectedSite)}_geo_${D.lastDate}.csv')">⬇ CSV</button>
+        </div>
+        <div class="table-wrap" style="max-height:460px">
+            <table>
+                <thead><tr><th>Страна</th><th style="text-align:right">Клики</th><th style="text-align:right">Показы</th><th style="text-align:right">Позиция</th><th style="text-align:right">CTR</th><th>Доля кликов</th></tr></thead>
+                <tbody>${data.map(r=>`<tr>
+                    <td>${countryFlag(r.country)} ${r.country}</td>
+                    <td class="mono" style="text-align:right">${fmt(r.clicks)}</td>
+                    <td class="mono" style="text-align:right">${fmt(r.impressions)}</td>
+                    <td class="mono" style="text-align:right">${posBadge(r.position||0)}</td>
+                    <td class="mono" style="text-align:right">${((r.ctr||0)*100).toFixed(2)}%</td>
+                    <td><div class="geo-bar-wrap"><div class="geo-bar" style="width:${Math.round(r.clicks/maxC*100)}px"></div><span style="font-size:10px;color:var(--muted)">${Math.round(r.clicks/maxC*100)}%</span></div></td>
+                </tr>`).join('')}</tbody>
+            </table>
+        </div>`;
+}
+
+function renderQueryPageContent(raw) {
+    const content = document.getElementById('detail-tab-content');
+    if (!content) return;
+    const data = applyFilters(raw, 'query');
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    // Detect cannibalization: same query → multiple pages
+    const byQuery = {};
+    data.forEach(r => { if (!byQuery[r.query]) byQuery[r.query] = []; byQuery[r.query].push(r); });
+    const cannibal = Object.keys(byQuery).filter(q => byQuery[q].length > 1).length;
+    content.innerHTML = `
+        ${cannibal > 0 ? `<div class="warn-banner" style="margin:10px 16px 0">⚠️ Возможная каннибализация: ${cannibal} запрос${cannibal>1?'ов':''} показывается на нескольких страницах</div>` : ''}
+        ${tabTableHTML('querypage', data, [
+            { label: 'Запрос', fn: r => `<span style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${r.query}</span>` },
+            { label: 'Страница', fn: r => `<span style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;color:var(--blue)" title="${r.page}">${r.page.replace(/https?:\/\/[^/]+/,'')}</span>` },
+            { label: 'Клики', r:true, fn: r => fmt(r.clicks) },
+            { label: 'Показы', r:true, fn: r => fmt(r.impressions) },
+            { label: 'Позиция', r:true, fn: r => posBadge(r.position||0) },
+            { label: 'CTR', r:true, fn: r => ((r.ctr||0)*100).toFixed(2)+'%' }
+        ])}`;
+}
+
+// ─── Tab loaders ─────────────────────────────────────────────────────────────
+async function loadKeywordsTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    if (!tabData.keywords) {
+        content.innerHTML = '<div class="tab-loading">⏳ Загрузка ключевых слов...</div>';
+        const data = await q('traffic_keywords', `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=500`);
+        tabData.keywords = data || [];
+    }
+    renderKeywordsContent(tabData.keywords);
+}
+
+async function loadPagesTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    if (!tabData.pages) {
+        content.innerHTML = '<div class="tab-loading">⏳ Загрузка страниц...</div>';
+        const data = await q('traffic_pages', `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=500`);
+        tabData.pages = data || [];
+    }
+    renderPagesContent(tabData.pages);
+}
+
+async function loadDevicesTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    if (!tabData.devices) {
+        content.innerHTML = '<div class="tab-loading">⏳ Загрузка устройств...</div>';
+        const data = await q('traffic_devices', `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc`);
+        tabData.devices = data || [];
+    }
+    renderDevicesContent(tabData.devices);
+}
+
+async function loadGeoTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    if (!tabData.geo) {
+        content.innerHTML = '<div class="tab-loading">⏳ Загрузка географии...</div>';
+        const data = await q('traffic_geo', `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=150`);
+        tabData.geo = data || [];
+    }
+    renderGeoContent(tabData.geo);
+}
+
+async function loadQueryPageTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    if (!tabData.querypage) {
+        content.innerHTML = '<div class="tab-loading">⏳ Загрузка данных...</div>';
+        const data = await q('traffic_query_page', `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=impressions.desc&limit=1000`);
+        tabData.querypage = data || [];
+    }
+    renderQueryPageContent(tabData.querypage);
+}
+
+// ─── switchDetailTab ─────────────────────────────────────────────────────────
+async function switchDetailTab(tab) {
+    detailTab = tab;
+    document.querySelectorAll('.detail-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    const controls = document.getElementById('tab-controls');
+    const content = document.getElementById('detail-tab-content');
+    const fp = document.getElementById('filter-panel');
+    if (tab === 'overview') {
+        if (controls) controls.style.display = 'flex';
+        if (fp) fp.style.display = 'none';
+        content.innerHTML = '<div style="height:400px"><canvas id="detailChart"></canvas></div>';
+        setTimeout(() => drawDetailChart(S.selectedSite), 50);
+    } else {
+        if (controls) controls.style.display = 'none';
+        if (fp) fp.style.display = 'flex';
+        if (tab === 'keywords') await loadKeywordsTab(S.selectedSite);
+        else if (tab === 'pages') await loadPagesTab(S.selectedSite);
+        else if (tab === 'devices') await loadDevicesTab(S.selectedSite);
+        else if (tab === 'geo') await loadGeoTab(S.selectedSite);
+        else if (tab === 'querypage') await loadQueryPageTab(S.selectedSite);
+        updateFilterCount();
+    }
+}
+
+// ─── Navigation ─────────────────────────────────────────────────────────────
+function openSite(siteUrl) { S.view='detail'; S.selectedSite=siteUrl; tabData={}; F={preset:'',posMin:'',posMax:'',search:'',minClicks:'',minImpressions:''}; render(); }
+function goBack() { S.view='overview'; S.selectedSite=null; render(); }
+function setSort(col) { if(S.sort===col) S.sortDir*=-1; else{S.sort=col;S.sortDir=-1;} render(); }
 function sortedSites() {
     let sites = [...D.sites];
     if (S.search) sites = sites.filter(s => shortUrl(s.site_url).toLowerCase().includes(S.search.toLowerCase()));
     if (S.statusFilter) sites = sites.filter(s => status(s) === S.statusFilter);
-    sites.sort((a, b) => ((b[S.sort] || 0) - (a[S.sort] || 0)) * S.sortDir);
+    sites.sort((a,b) => ((b[S.sort]||0)-(a[S.sort]||0))*S.sortDir);
     return sites;
 }
-
-function sortArrow(col) {
-    if (S.sort !== col) return '';
-    return `<span class="sort-arrow">${S.sortDir === -1 ? '↓' : '↑'}</span>`;
-}
-
-function filterSites(val) {
-    S.search = val;
-    const q = val.toLowerCase();
-    document.querySelectorAll('tr[data-url]').forEach(tr => {
-        tr.style.display = (!q || tr.dataset.url.includes(q)) ? '' : 'none';
-    });
-}
-
-function setStatusFilter(f) {
-    S.statusFilter = f;
-    render();
-}
-
+function sortArrow(col) { if(S.sort!==col) return ''; return `<span class="sort-arrow">${S.sortDir===-1?'↓':'↑'}</span>`; }
+function filterSites(val) { S.search=val; const ql=val.toLowerCase(); document.querySelectorAll('tr[data-url]').forEach(tr=>{tr.style.display=(!ql||tr.dataset.url.includes(ql))?'':'none';}); }
+function setStatusFilter(f) { S.statusFilter=f; render(); }
 function toggleSelect(url, e) {
     if (e) e.stopPropagation();
-    if (S.selected.has(url)) S.selected.delete(url);
-    else S.selected.add(url);
-    // Update row highlight
-    document.querySelectorAll('tr[data-url]').forEach(tr => {
-        if (tr.dataset.siteurl === url) tr.classList.toggle('selected-row', S.selected.has(url));
-    });
-    // Update checkbox
-    document.querySelectorAll(`input[data-cmp="${CSS.escape(url)}"]`).forEach(cb => cb.checked = S.selected.has(url));
-    // Update compare bar
-    const bar = document.getElementById('compare-bar');
-    if (bar) {
-        bar.classList.toggle('visible', S.selected.size >= 2);
-        const cnt = bar.querySelector('.cmp-count'); if (cnt) cnt.textContent = S.selected.size;
+    if (S.selected.has(url)) S.selected.delete(url); else S.selected.add(url);
+    document.querySelectorAll('tr[data-url]').forEach(tr=>{if(tr.dataset.siteurl===url)tr.classList.toggle('selected-row',S.selected.has(url));});
+    document.querySelectorAll(`input[data-cmp="${CSS.escape(url)}"]`).forEach(cb=>cb.checked=S.selected.has(url));
+    const bar=document.getElementById('compare-bar');
+    if(bar){bar.classList.toggle('visible',S.selected.size>=2);const cnt=bar.querySelector('.cmp-count');if(cnt)cnt.textContent=S.selected.size;}
+}
+function clearSelection() { S.selected.clear(); render(); }
+function openComparison() { if(S.selected.size<2) return; S.view='compare'; S.compareTab='chart'; S.compareDevice=''; render(); }
+
+// ─── Comparison ─────────────────────────────────────────────────────────────
+const CMP_COLORS = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'];
+
+function switchCmpTab(tab) {
+    S.compareTab = tab;
+    document.querySelectorAll('.cmp-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    const cc = document.getElementById('cmp-content');
+    if (!cc) return;
+    if (tab === 'chart') {
+        cc.innerHTML = `<div style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;padding:0 4px">
+            <span style="font-size:11px;color:var(--muted);align-self:center">Устройство:</span>
+            ${['','DESKTOP','MOBILE','TABLET'].map(d=>`<button class="dev-btn ${S.compareDevice===d?'active':''}" onclick="setCmpDevice('${d}')">${d||'Все'}</button>`).join('')}
+        </div>
+        <div style="height:380px"><canvas id="compareChart"></canvas></div>`;
+        setTimeout(drawCompareChart, 50);
+    } else if (tab === 'table') {
+        renderCmpTable();
+    } else if (tab === 'keywords') {
+        loadCommonKeywords();
     }
 }
 
-function clearSelection() {
-    S.selected.clear();
-    render();
+function setCmpDevice(d) {
+    S.compareDevice = d;
+    document.querySelectorAll('.dev-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === (d||'Все')));
+    drawCompareChart();
 }
 
-function openComparison() {
-    if (S.selected.size < 2) return;
-    S.view = 'compare';
-    render();
+function renderCmpTable() {
+    const cc = document.getElementById('cmp-content');
+    if (!cc) return;
+    const selectedArr = [...S.selected];
+    const sites = selectedArr.map(url => D.sites.find(s => s.site_url === url)).filter(Boolean);
+    cc.innerHTML = `<div class="table-wrap"><table>
+        <thead><tr><th></th><th>Сайт</th><th style="text-align:right">Клики</th><th style="text-align:right">Показы</th><th style="text-align:right">Позиция</th><th style="text-align:right">CTR</th><th style="text-align:right">Изм. кликов</th></tr></thead>
+        <tbody>${sites.map((s,i)=>`<tr>
+            <td style="width:12px;padding:0 12px"><div style="width:10px;height:10px;border-radius:50%;background:${CMP_COLORS[i]}"></div></td>
+            <td><b>${shortUrl(s.site_url)}</b></td>
+            <td class="mono" style="text-align:right">${fmt(s.clicks)}</td>
+            <td class="mono" style="text-align:right">${fmt(s.impressions)}</td>
+            <td class="mono" style="text-align:right">${(s.position||0).toFixed(1)}</td>
+            <td class="mono" style="text-align:right">${((s.ctr||0)*100).toFixed(2)}%</td>
+            <td class="mono trend ${(s.clicks_change||0)>=0?'up':'down'}" style="text-align:right">${(s.clicks_change||0)>=0?'+':''}${(s.clicks_change||0).toFixed(1)}%</td>
+        </tr>`).join('')}</tbody>
+    </table></div>`;
 }
 
-const CMP_COLORS = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899','#6366f1'];
+async function loadCommonKeywords() {
+    const cc = document.getElementById('cmp-content');
+    if (!cc) return;
+    cc.innerHTML = '<div class="tab-loading">⏳ Загрузка ключевых слов...</div>';
+    const selectedArr = [...S.selected];
+    const kwBySite = await Promise.all(selectedArr.map(url =>
+        q('traffic_keywords', `site_url=eq.${encodeURIComponent(url)}&date=eq.${D.lastDate}&order=impressions.desc&limit=1000`)
+    ));
+    const maps = kwBySite.map(kws => { const m = new Map(); kws.forEach(k => m.set(k.query, k)); return m; });
+    const common = [...maps[0].keys()].filter(qr => maps.every(m => m.has(qr)));
+    if (!common.length) { cc.innerHTML = '<div class="tab-empty">Нет общих ключевых слов для выбранных сайтов.</div>'; return; }
+    const rows = common.map(qr => ({ query: qr, data: maps.map(m => m.get(qr)) }))
+        .sort((a,b) => { const ai=a.data.reduce((s,d)=>s+(d?.impressions||0),0), bi=b.data.reduce((s,d)=>s+(d?.impressions||0),0); return bi-ai; });
+    cc.innerHTML = `<div style="padding:10px 16px;font-size:12px;color:var(--muted)">Найдено ${common.length} общих запросов (показаны топ-300 по показам)</div>
+        <div class="table-wrap" style="max-height:460px"><table>
+            <thead><tr>
+                <th>Запрос</th>
+                <th style="text-align:right">Показы (σ)</th>
+                ${selectedArr.map((url,i)=>`<th style="text-align:right;color:${CMP_COLORS[i]}">${shortUrl(url).substring(0,16)} Поз.</th><th style="text-align:right;color:${CMP_COLORS[i]}">CTR</th>`).join('')}
+            </tr></thead>
+            <tbody>${rows.slice(0,300).map(r=>`<tr>
+                <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.query}</td>
+                <td class="mono" style="text-align:right">${fmt(r.data.reduce((s,d)=>s+(d?.impressions||0),0))}</td>
+                ${r.data.map(d=>`<td class="mono" style="text-align:right">${d?posBadge(d.position):'—'}</td><td class="mono" style="text-align:right;color:var(--muted)">${d?((d.ctr||0)*100).toFixed(1)+'%':'—'}</td>`).join('')}
+            </tr>`).join('')}</tbody>
+        </table></div>`;
+}
+
+async function drawCompareChart() {
+    if (charts.compareChart) { charts.compareChart.destroy(); delete charts.compareChart; }
+    const canvas = document.getElementById('compareChart');
+    if (!canvas) return;
+    const selectedArr = [...S.selected];
+    const allDates = [...new Set(D.daily.map(d => d.date))].sort();
+    const dates = allDates.slice(-35);
+    const labels = dates.map(d => fmtDate(d));
+    const metric = S.compareMetric;
+    const isCtr = metric === 'ctr';
+    let datasets;
+    if (S.compareDevice) {
+        const cutoff = dates[0];
+        const deviceData = await Promise.all(selectedArr.map(url =>
+            q('traffic_daily_device', `site_url=eq.${encodeURIComponent(url)}&device=eq.${S.compareDevice}&date=gte.${cutoff}&order=date.asc&limit=50`)
+        ));
+        datasets = selectedArr.map((url,i) => {
+            const dm = {}; (deviceData[i]||[]).forEach(d => dm[d.date]=d);
+            return { label: shortUrl(url), data: dates.map(d=>{const r=dm[d]; return r?(isCtr?+(r[metric]*100).toFixed(2):r[metric]):null;}), borderColor:CMP_COLORS[i], backgroundColor:CMP_COLORS[i]+'18', fill:false, tension:0.4, borderWidth:2, pointRadius:0, pointHoverRadius:4, spanGaps:true };
+        });
+    } else {
+        datasets = selectedArr.map((url,i) => {
+            const dm = {}; D.daily.filter(d=>d.site_url===url).forEach(d=>dm[d.date]=d);
+            return { label: shortUrl(url), data: dates.map(d=>{const r=dm[d]; return r?(isCtr?+(r[metric]*100).toFixed(2):r[metric]):null;}), borderColor:CMP_COLORS[i], backgroundColor:CMP_COLORS[i]+'18', fill:false, tension:0.4, borderWidth:2, pointRadius:0, pointHoverRadius:4, spanGaps:true };
+        });
+    }
+    const yReverse = metric === 'position';
+    const isPct = isCtr;
+    charts.compareChart = new Chart(canvas, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive:true, maintainAspectRatio:false, animation:false,
+            interaction:{mode:'index',intersect:false},
+            plugins:{legend:{display:true,position:'top',labels:{color:'#9ca3af',boxWidth:12,font:{size:11}}},tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${isPct?ctx.parsed.y+'%':fmt(ctx.parsed.y)}`}}},
+            scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',font:{size:10},maxTicksLimit:12}},y:{reverse:yReverse,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#9ca3af',font:{size:10},callback:v=>isPct?v+'%':fmt(v)}}}
+        }
+    });
+}
 
 function renderComparison() {
     const selectedArr = [...S.selected];
     const sites = selectedArr.map(url => D.sites.find(s => s.site_url === url)).filter(Boolean);
-
     document.getElementById('app').innerHTML = `
         <header class="header">
-            <div class="logo" onclick="S.view='overview';S.selectedSite=null;render()">
-                <div class="logo-icon">📊</div>GSC Traffic Monitor
-            </div>
-            <div class="header-right">
-                <span>🌐 ${D.lastDate || '—'}</span>
-            </div>
+            <div class="logo" onclick="S.view='overview';S.selectedSite=null;render()"><div class="logo-icon">📊</div>GSC Traffic Monitor</div>
+            <div class="header-right"><span>🌐 ${D.lastDate||'—'}</span></div>
         </header>
         <main class="main">
             <button class="back-btn" onclick="S.view='overview';render()">← Все сайты</button>
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
                 <span style="font-size:18px;font-weight:700">📊 Сравнение сайтов</span>
-                ${sites.map((s,i) => `<span class="compare-chip" style="background:${CMP_COLORS[i]}22;color:${CMP_COLORS[i]};border:1px solid ${CMP_COLORS[i]}44">${shortUrl(s.site_url)}</span>`).join('')}
-            </div>
-            <div class="panel" style="margin-bottom:16px">
-                <div class="panel-header">
-                    <div class="panel-title">📈 Трафик по дням</div>
-                    <div style="display:flex;gap:6px">
-                        <button class="cmp-metric-btn ${S.compareMetric==='clicks'?'active':''}" onclick="S.compareMetric='clicks';drawCompareChart()">Клики</button>
-                        <button class="cmp-metric-btn ${S.compareMetric==='impressions'?'active':''}" onclick="S.compareMetric='impressions';drawCompareChart()">Показы</button>
-                        <button class="cmp-metric-btn ${S.compareMetric==='position'?'active':''}" onclick="S.compareMetric='position';drawCompareChart()">Позиция</button>
-                        <button class="cmp-metric-btn ${S.compareMetric==='ctr'?'active':''}" onclick="S.compareMetric='ctr';drawCompareChart()">CTR</button>
-                    </div>
-                </div>
-                <div class="panel-body"><div style="height:380px"><canvas id="compareChart"></canvas></div></div>
+                ${sites.map((s,i)=>`<span class="compare-chip" style="background:${CMP_COLORS[i]}22;color:${CMP_COLORS[i]};border:1px solid ${CMP_COLORS[i]}44">${shortUrl(s.site_url)}</span>`).join('')}
             </div>
             <div class="panel">
-                <div class="panel-header"><div class="panel-title">📋 Сводная таблица (за период)</div></div>
-                <div class="panel-body flush">
-                    <table>
-                        <thead><tr>
-                            <th></th><th>Сайт</th>
-                            <th class="mono" style="text-align:right">Клики</th>
-                            <th class="mono" style="text-align:right">Показы</th>
-                            <th class="mono" style="text-align:right">Позиция</th>
-                            <th class="mono" style="text-align:right">CTR</th>
-                            <th class="mono" style="text-align:right">Изм. кликов</th>
-                        </tr></thead>
-                        <tbody>
-                        ${sites.map((s,i) => `<tr>
-                            <td style="width:12px;padding:0 12px"><div style="width:10px;height:10px;border-radius:50%;background:${CMP_COLORS[i]}"></div></td>
-                            <td><b>${shortUrl(s.site_url)}</b></td>
-                            <td class="mono" style="text-align:right">${fmt(s.clicks)}</td>
-                            <td class="mono" style="text-align:right">${fmt(s.impressions)}</td>
-                            <td class="mono" style="text-align:right">${(s.position||0).toFixed(1)}</td>
-                            <td class="mono" style="text-align:right">${((s.ctr||0)*100).toFixed(2)}%</td>
-                            <td class="mono trend ${(s.clicks_change||0)>=0?'up':'down'}" style="text-align:right">${(s.clicks_change||0)>=0?'+':''}${(s.clicks_change||0).toFixed(1)}%</td>
-                        </tr>`).join('')}
-                        </tbody>
-                    </table>
+                <div class="panel-header" style="flex-wrap:wrap;gap:10px">
+                    <div style="display:flex;gap:6px">
+                        <button class="cmp-tab ${S.compareTab==='chart'?'active':''}" data-tab="chart" onclick="switchCmpTab('chart')">📈 График</button>
+                        <button class="cmp-tab ${S.compareTab==='table'?'active':''}" data-tab="table" onclick="switchCmpTab('table')">📋 Таблица</button>
+                        <button class="cmp-tab ${S.compareTab==='keywords'?'active':''}" data-tab="keywords" onclick="switchCmpTab('keywords')">🔑 Общие ключи</button>
+                    </div>
+                    <div id="cmp-metrics" style="display:flex;gap:6px">
+                        ${['clicks','impressions','position','ctr'].map(m=>`<button class="cmp-metric-btn ${S.compareMetric===m?'active':''}" onclick="S.compareMetric='${m}';document.querySelectorAll('.cmp-metric-btn').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes('${m==='clicks'?'клик':m==='impressions'?'показ':m==='position'?'позиц':'ctr'}')));drawCompareChart()">${m==='clicks'?'Клики':m==='impressions'?'Показы':m==='position'?'Позиция':'CTR'}</button>`).join('')}
+                    </div>
+                </div>
+                <div id="cmp-content" class="panel-body">
+                    <div style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;padding:0 4px">
+                        <span style="font-size:11px;color:var(--muted);align-self:center">Устройство:</span>
+                        ${['','DESKTOP','MOBILE','TABLET'].map(d=>`<button class="dev-btn ${S.compareDevice===d?'active':''}" onclick="setCmpDevice('${d}')">${d||'Все'}</button>`).join('')}
+                    </div>
+                    <div style="height:380px"><canvas id="compareChart"></canvas></div>
                 </div>
             </div>
-        </main>
-    `;
+        </main>`;
     setTimeout(drawCompareChart, 50);
 }
 
-function drawCompareChart() {
-    if (charts.compareChart) { charts.compareChart.destroy(); delete charts.compareChart; }
-    const canvas = document.getElementById('compareChart');
-    if (!canvas) return;
-    const selectedArr = [...S.selected];
-    // Get all dates union
-    const allDates = [...new Set(D.daily.map(d => d.date))].sort();
-    // Last 35 days
-    const dates = allDates.slice(-35);
-    const labels = dates.map(d => fmtDate(d));
-    const metric = S.compareMetric;
-    const isCtr = metric === 'ctr';
-    const isPct = isCtr;
-
-    // Update metric buttons
-    document.querySelectorAll('.cmp-metric-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(
-            metric === 'clicks' ? 'клик' : metric === 'impressions' ? 'показ' : metric === 'position' ? 'позиц' : 'ctr'
-        ));
-    });
-
-    const datasets = selectedArr.map((url, i) => {
-        const dailyMap = {};
-        D.daily.filter(d => d.site_url === url).forEach(d => dailyMap[d.date] = d);
-        const data = dates.map(d => {
-            const row = dailyMap[d];
-            if (!row) return null;
-            return isCtr ? +(row[metric]*100).toFixed(2) : row[metric];
-        });
-        return {
-            label: shortUrl(url),
-            data,
-            borderColor: CMP_COLORS[i],
-            backgroundColor: CMP_COLORS[i] + '18',
-            fill: false,
-            tension: 0.4,
-            borderWidth: 2,
-            pointRadius: 0,
-            pointHoverRadius: 4,
-            spanGaps: true
-        };
-    });
-
-    const yReverse = metric === 'position';
-    charts.compareChart = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: { labels, datasets },
-        options: {
-            responsive: true, maintainAspectRatio: false, animation: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { display: true, position: 'top', labels: { color: '#9ca3af', boxWidth: 12, font: { size: 11 } } },
-                tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${isPct ? ctx.parsed.y + '%' : fmt(ctx.parsed.y)}` } }
-            },
-            scales: {
-                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 12 } },
-                y: { reverse: yReverse, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#9ca3af', font: { size: 10 }, callback: v => isPct ? v + '%' : fmt(v) } }
-            }
-        }
-    });
-}
-
+// ─── renderDetail ─────────────────────────────────────────────────────────────
 function renderDetail() {
     const site = D.sites.find(s => s.site_url === S.selectedSite);
     if (!site) { goBack(); return; }
     detailTab = 'overview';
-
     const daily = siteDaily(S.selectedSite);
     const name = shortUrl(site.site_url);
     const chg = site.clicks_change || 0;
-
-    // Calculate site-specific stats from daily data
-    const totalClicks = daily.reduce((s, d) => s + (d.clicks || 0), 0);
-    const totalImpr = daily.reduce((s, d) => s + (d.impressions || 0), 0);
-    const avgPos = daily.length ? daily.reduce((s, d) => s + (d.position || 0), 0) / daily.length : 0;
-    const avgCtr = daily.length ? daily.reduce((s, d) => s + (d.ctr || 0), 0) / daily.length : 0;
+    const totalClicks = daily.reduce((s,d)=>s+(d.clicks||0),0);
+    const totalImpr = daily.reduce((s,d)=>s+(d.impressions||0),0);
+    const avgPos = daily.length ? daily.reduce((s,d)=>s+(d.position||0),0)/daily.length : 0;
+    const avgCtr = daily.length ? daily.reduce((s,d)=>s+(d.ctr||0),0)/daily.length : 0;
 
     document.getElementById('app').innerHTML = `
         <header class="header">
-            <div class="logo" onclick="goBack()">
-                <div class="logo-icon">📊</div>
-                GSC Traffic Monitor
-            </div>
+            <div class="logo" onclick="goBack()"><div class="logo-icon">📊</div>GSC Traffic Monitor</div>
             <div class="header-right">
-                <span>${D.firstDate ? fmtDate(D.firstDate) : ''} — ${D.lastDate ? fmtDate(D.lastDate) : ''}</span>
+                <span>${D.firstDate?fmtDate(D.firstDate):''} — ${D.lastDate?fmtDate(D.lastDate):''}</span>
                 <span>${daily.length} дней данных</span>
             </div>
         </header>
-
         <main class="main">
             <button class="back-btn" onclick="goBack()">← Все сайты</button>
-
             <div class="detail-header">
                 <div class="detail-title">${name}</div>
-                <div class="detail-badge ${chg >= 0 ? 'up' : 'down'}">${chg >= 0 ? '↑' : '↓'} ${Math.abs(chg).toFixed(1)}% кликов vs пред. период</div>
+                <div class="detail-badge ${chg>=0?'up':'down'}">${chg>=0?'↑':'↓'} ${Math.abs(chg).toFixed(1)}% кликов vs пред. период</div>
             </div>
-
-            <div class="stats" style="grid-template-columns: repeat(4, 1fr);">
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">👆</span></div>
-                    <div class="stat-value" style="color:var(--blue)">${fmt(totalClicks)}</div>
-                    <div class="stat-label">Клики за период</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">👁</span></div>
-                    <div class="stat-value" style="color:var(--purple)">${fmt(totalImpr)}</div>
-                    <div class="stat-label">Показы за период</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">📍</span></div>
-                    <div class="stat-value" style="color:var(--yellow)">${avgPos.toFixed(1)}</div>
-                    <div class="stat-label">Ср. позиция</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">🎯</span></div>
-                    <div class="stat-value" style="color:var(--green)">${(avgCtr * 100).toFixed(2)}%</div>
-                    <div class="stat-label">Ср. CTR</div>
-                </div>
+            <div class="stats" style="grid-template-columns:repeat(4,1fr);">
+                <div class="stat"><div class="stat-top"><span class="stat-icon">👆</span></div><div class="stat-value" style="color:var(--blue)">${fmt(totalClicks)}</div><div class="stat-label">Клики за период</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">👁</span></div><div class="stat-value" style="color:var(--purple)">${fmt(totalImpr)}</div><div class="stat-label">Показы за период</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">📍</span></div><div class="stat-value" style="color:var(--yellow)">${avgPos.toFixed(1)}</div><div class="stat-label">Ср. позиция</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">🎯</span></div><div class="stat-value" style="color:var(--green)">${(avgCtr*100).toFixed(2)}%</div><div class="stat-label">Ср. CTR</div></div>
             </div>
-
             <div class="panel">
                 <div class="panel-header" style="flex-wrap:wrap;gap:10px">
                     <div class="detail-tabs">
                         <button class="detail-tab active" data-tab="overview" onclick="switchDetailTab('overview')">📈 Обзор</button>
-                        <button class="detail-tab" data-tab="keywords" onclick="switchDetailTab('keywords')">🔑 Ключевые слова</button>
-                        <button class="detail-tab" data-tab="geo" onclick="switchDetailTab('geo')">🌍 География</button>
+                        <button class="detail-tab" data-tab="keywords" onclick="switchDetailTab('keywords')">🔑 Ключи</button>
+                        <button class="detail-tab" data-tab="pages" onclick="switchDetailTab('pages')">📄 Страницы</button>
+                        <button class="detail-tab" data-tab="devices" onclick="switchDetailTab('devices')">📱 Устройства</button>
+                        <button class="detail-tab" data-tab="querypage" onclick="switchDetailTab('querypage')">🔗 Запрос→Страница</button>
+                        <button class="detail-tab" data-tab="geo" onclick="switchDetailTab('geo')">🌍 Гео</button>
                     </div>
                     <div id="tab-controls" style="display:flex;gap:8px;">
                         <button class="toggle-btn ${detailVisible.clicks?'active':''}" data-metric="clicks" onclick="toggleMetric('clicks')" style="--tc:#3b82f6">Клики</button>
@@ -1060,107 +841,55 @@ function renderDetail() {
                         <button class="toggle-btn ${detailVisible.ctr?'active':''}" data-metric="ctr" onclick="toggleMetric('ctr')" style="--tc:#10b981">CTR</button>
                     </div>
                 </div>
+                ${buildFilterPanel().replace('id="filter-panel"', 'id="filter-panel" style="display:none"')}
                 <div id="detail-tab-content" class="panel-body">
                     <div style="height:400px"><canvas id="detailChart"></canvas></div>
                 </div>
             </div>
-        </main>
-    `;
+        </main>`;
 
     setTimeout(() => drawDetailChart(S.selectedSite), 50);
 }
 
+// ─── render (overview) ────────────────────────────────────────────────────────
 function render() {
     destroyAllCharts();
-
     if (S.view === 'detail' && S.selectedSite) { renderDetail(); return; }
     if (S.view === 'compare' && S.selected.size >= 2) { renderComparison(); return; }
 
     const st = stats();
     const sites = sortedSites();
-
     if (!D.sites.length && !D.daily.length) {
-        document.getElementById('app').innerHTML = `
-            <div class="empty">
-                <div class="empty-icon">📊</div>
-                <h2>Нет данных</h2>
-                <p style="margin-top:8px;color:var(--muted)">Запустите сбор данных через GitHub Actions</p>
-            </div>
-        `;
+        document.getElementById('app').innerHTML = `<div class="empty"><div class="empty-icon">📊</div><h2>Нет данных</h2><p style="margin-top:8px;color:var(--muted)">Запустите сбор данных через GitHub Actions</p></div>`;
         return;
     }
-
-    const stale = isDataStale();
-    const days = staleDays();
+    const stale = isDataStale(), days = staleDays();
 
     document.getElementById('app').innerHTML = `
         <header class="header">
-            <div class="logo" onclick="S.view='overview';S.selectedSite=null;render()">
-                <div class="logo-icon">📊</div>
-                GSC Traffic Monitor
-            </div>
+            <div class="logo" onclick="S.view='overview';S.selectedSite=null;render()"><div class="logo-icon">📊</div>GSC Traffic Monitor</div>
             <div class="header-right">
-                <span>${stale ? '<span class="stale-dot"></span>Устарело' : '<span class="live-dot"></span>Live'}</span>
-                <span>📅 ${D.lastDate || '—'}</span>
+                <span>${stale?'<span class="stale-dot"></span>Устарело':'<span class="live-dot"></span>Live'}</span>
+                <span>📅 ${D.lastDate||'—'}</span>
                 <span>🌐 ${st.count} сайтов</span>
             </div>
         </header>
-
         <main class="main">
-            ${stale ? `<div class="warn-banner">⚠️ Данные устарели на ${days} дней (последние: ${D.lastDate}). Запустите GitHub Actions вручную или проверьте настройку workflow.</div>` : ''}
-
+            ${stale?`<div class="warn-banner">⚠️ Данные устарели на ${days} дней (последние: ${D.lastDate}). Запустите GitHub Actions вручную или проверьте настройку workflow.</div>`:''}
             <div class="stats">
-                <div class="stat">
-                    <div class="stat-top">
-                        <span class="stat-icon">👆</span>
-                        <span class="stat-change ${st.avgChg >= 0 ? 'up' : 'down'}">${st.avgChg >= 0 ? '↑' : '↓'} ${Math.abs(st.avgChg).toFixed(1)}%</span>
-                    </div>
-                    <div class="stat-value" style="color:var(--blue)">${fmt(st.clicks)}</div>
-                    <div class="stat-label">Клики</div>
-                    <div class="stat-sub">Сумма за 30 дней по всем сайтам</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">👁</span></div>
-                    <div class="stat-value" style="color:var(--purple)">${fmt(st.impressions)}</div>
-                    <div class="stat-label">Показы</div>
-                    <div class="stat-sub">Сумма за 30 дней по всем сайтам</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">📍</span></div>
-                    <div class="stat-value" style="color:var(--yellow)">${st.avgPos.toFixed(1)}</div>
-                    <div class="stat-label">Ср. позиция</div>
-                    <div class="stat-sub">Среднее по всем сайтам</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">🎯</span></div>
-                    <div class="stat-value" style="color:var(--green)">${(st.avgCtr * 100).toFixed(2)}%</div>
-                    <div class="stat-label">Ср. CTR</div>
-                    <div class="stat-sub">Среднее по всем сайтам</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-top"><span class="stat-icon">🌐</span></div>
-                    <div class="stat-value" style="color:var(--cyan)">${st.count}</div>
-                    <div class="stat-label">Сайтов</div>
-                </div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">👆</span><span class="stat-change ${st.avgChg>=0?'up':'down'}">${st.avgChg>=0?'↑':'↓'} ${Math.abs(st.avgChg).toFixed(1)}%</span></div><div class="stat-value" style="color:var(--blue)">${fmt(st.clicks)}</div><div class="stat-label">Клики</div><div class="stat-sub">Сумма за 30 дней по всем сайтам</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">👁</span></div><div class="stat-value" style="color:var(--purple)">${fmt(st.impressions)}</div><div class="stat-label">Показы</div><div class="stat-sub">Сумма за 30 дней по всем сайтам</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">📍</span></div><div class="stat-value" style="color:var(--yellow)">${st.avgPos.toFixed(1)}</div><div class="stat-label">Ср. позиция</div><div class="stat-sub">Среднее по всем сайтам</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">🎯</span></div><div class="stat-value" style="color:var(--green)">${(st.avgCtr*100).toFixed(2)}%</div><div class="stat-label">Ср. CTR</div><div class="stat-sub">Среднее по всем сайтам</div></div>
+                <div class="stat"><div class="stat-top"><span class="stat-icon">🌐</span></div><div class="stat-value" style="color:var(--cyan)">${st.count}</div><div class="stat-label">Сайтов</div></div>
             </div>
-
-            <div class="grid-wide" style="grid-template-columns:1fr">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div class="panel-title">📈 Ежедневный трафик</div>
-                        <div class="legend">
-                            <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Клики</div>
-                            <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Показы</div>
-                        </div>
-                    </div>
-                    <div class="panel-body"><div class="chart-box"><canvas id="chartTraffic"></canvas></div></div>
-                </div>
+            <div style="margin-bottom:14px">
+                <div class="panel"><div class="panel-header"><div class="panel-title">📈 Ежедневный трафик</div><div class="legend"><div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Клики</div><div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Показы</div></div></div><div class="panel-body"><div class="chart-box"><canvas id="chartTraffic"></canvas></div></div></div>
             </div>
-
             <div class="grid-wide">
                 <div class="panel">
                     <div class="panel-header">
-                        <div class="panel-title">🌐 Все сайты <span style="font-weight:400;font-size:11px;color:var(--muted);margin-left:8px">нажмите на сайт для детального просмотра</span></div>
+                        <div class="panel-title">🌐 Все сайты <span style="font-weight:400;font-size:11px;color:var(--muted);margin-left:8px">нажмите для деталей</span></div>
                         <input type="text" class="search-input" id="siteSearch" placeholder="Поиск..." value="${S.search}" oninput="filterSites(this.value)">
                     </div>
                     <div class="filter-bar">
@@ -1182,38 +911,27 @@ function render() {
                     <div class="panel-body flush">
                         <div class="table-wrap">
                             <table>
-                                <thead>
-                                    <tr>
-                                        <th class="check-cell"><input type="checkbox" title="Выбрать все" onchange="(function(cb){if(cb.checked){sortedSites().forEach(s=>S.selected.add(s.site_url));}else{sortedSites().forEach(s=>S.selected.delete(s.site_url));}render();})(this)"></th>
-                                        <th onclick="setSort('site_url')">Сайт</th>
-                                        <th onclick="setSort('clicks')">Клики ${sortArrow('clicks')}</th>
-                                        <th onclick="setSort('impressions')">Показы ${sortArrow('impressions')}</th>
-                                        <th onclick="setSort('position')">Позиция ${sortArrow('position')}</th>
-                                        <th onclick="setSort('ctr')">CTR ${sortArrow('ctr')}</th>
-                                        <th>Изм.%</th>
-                                        <th>Тренд (28д)</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr>
+                                    <th class="check-cell"><input type="checkbox" title="Выбрать все" onchange="(function(cb){if(cb.checked){sortedSites().forEach(s=>S.selected.add(s.site_url));}else{sortedSites().forEach(s=>S.selected.delete(s.site_url));}render();})(this)"></th>
+                                    <th onclick="setSort('site_url')">Сайт</th>
+                                    <th onclick="setSort('clicks')">Клики ${sortArrow('clicks')}</th>
+                                    <th onclick="setSort('impressions')">Показы ${sortArrow('impressions')}</th>
+                                    <th onclick="setSort('position')">Позиция ${sortArrow('position')}</th>
+                                    <th onclick="setSort('ctr')">CTR ${sortArrow('ctr')}</th>
+                                    <th>Изм.%</th>
+                                    <th>Тренд (28д)</th>
+                                </tr></thead>
                                 <tbody>
-                                    ${sites.map((s, i) => `
-                                        <tr class="clickable ${S.selected.has(s.site_url)?'selected-row':''}" data-url="${shortUrl(s.site_url).toLowerCase()}" data-siteurl="${s.site_url.replace(/"/g,'&quot;')}" onclick="openSite('${s.site_url.replace(/'/g, "\\'")}')">
-                                            <td class="check-cell" onclick="event.stopPropagation()">
-                                                <input type="checkbox" data-cmp="${s.site_url.replace(/"/g,'&quot;')}" ${S.selected.has(s.site_url)?'checked':''} onchange="toggleSelect('${s.site_url.replace(/'/g,"\\'")}',event)">
-                                            </td>
-                                            <td>
-                                                <div class="site-cell">
-                                                    <div class="site-dot ${status(s)}"></div>
-                                                    <span class="site-name" title="${shortUrl(s.site_url)}">${shortUrl(s.site_url)}</span>
-                                                </div>
-                                            </td>
-                                            <td class="mono">${fmt(s.clicks)}</td>
-                                            <td class="mono">${fmt(s.impressions)}</td>
-                                            <td class="mono">${(s.position||0).toFixed(1)}</td>
-                                            <td class="mono">${((s.ctr||0)*100).toFixed(2)}%</td>
-                                            <td class="mono trend ${(s.clicks_change||0)>=0?'up':'down'}" style="font-size:11px">${(s.clicks_change||0)>=0?'+':''}${(s.clicks_change||0).toFixed(1)}%</td>
-                                            <td><canvas class="spark" id="spark${i}"></canvas></td>
-                                        </tr>
-                                    `).join('')}
+                                    ${sites.map((s,i)=>`<tr class="clickable ${S.selected.has(s.site_url)?'selected-row':''}" data-url="${shortUrl(s.site_url).toLowerCase()}" data-siteurl="${s.site_url.replace(/"/g,'&quot;')}" onclick="openSite('${s.site_url.replace(/'/g,"\\'")}')">
+                                        <td class="check-cell" onclick="event.stopPropagation()"><input type="checkbox" data-cmp="${s.site_url.replace(/"/g,'&quot;')}" ${S.selected.has(s.site_url)?'checked':''} onchange="toggleSelect('${s.site_url.replace(/'/g,"\\'")}',event)"></td>
+                                        <td><div class="site-cell"><div class="site-dot ${status(s)}"></div><span class="site-name" title="${shortUrl(s.site_url)}">${shortUrl(s.site_url)}</span></div></td>
+                                        <td class="mono">${fmt(s.clicks)}</td>
+                                        <td class="mono">${fmt(s.impressions)}</td>
+                                        <td class="mono">${(s.position||0).toFixed(1)}</td>
+                                        <td class="mono">${((s.ctr||0)*100).toFixed(2)}%</td>
+                                        <td class="mono trend ${(s.clicks_change||0)>=0?'up':'down'}" style="font-size:11px">${(s.clicks_change||0)>=0?'+':''}${(s.clicks_change||0).toFixed(1)}%</td>
+                                        <td><canvas class="spark" id="spark${i}"></canvas></td>
+                                    </tr>`).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -1225,21 +943,15 @@ function render() {
                 </div>
             </div>
         </main>
-
-        <div id="compare-bar" class="compare-bar ${S.selected.size >= 2 ? 'visible' : ''}">
+        <div id="compare-bar" class="compare-bar ${S.selected.size>=2?'visible':''}">
             <span style="color:var(--text);font-size:13px">Выбрано: <b class="cmp-count">${S.selected.size}</b> сайт(а)</span>
             <button class="compare-bar-btn primary" onclick="openComparison()">📊 Сравнить</button>
             <button class="compare-bar-btn secondary" onclick="clearSelection()">✕ Сбросить</button>
-        </div>
-    `;
+        </div>`;
 
     setTimeout(() => {
         drawOverviewCharts();
-        sites.forEach((s, i) => {
-            const c = document.getElementById(`spark${i}`);
-            const data = siteDailyShort(s.site_url);
-            if (c && data.length > 1) drawSparkline(c, data);
-        });
+        sites.forEach((s,i) => { const c=document.getElementById(`spark${i}`); const data=siteDailyShort(s.site_url); if(c&&data.length>1) drawSparkline(c,data); });
     }, 50);
 }
 

@@ -442,8 +442,9 @@ function tabTableHTML(id, data, cols) {
 function renderKeywordsContent(raw) {
     const content = document.getElementById('detail-tab-content');
     if (!content) return;
+    if (!raw || !raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных по ключевым словам.<br><small style="color:var(--muted)">Запустите сбор данных для обновления.</small></div>'; return; }
     const data = applyFilters(raw, 'query');
-    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по текущему фильтру.</div>'; return; }
     content.innerHTML = tabTableHTML('kw', data, [
         { label: 'Запрос', fn: r => `<span style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block">${r.query}</span>` },
         { label: 'Клики', r:true, fn: r => fmt(r.clicks) },
@@ -456,8 +457,9 @@ function renderKeywordsContent(raw) {
 function renderPagesContent(raw) {
     const content = document.getElementById('detail-tab-content');
     if (!content) return;
+    if (!raw || !raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных по страницам.<br><small style="color:var(--muted)">Запустите setup.sql и сбор данных.</small></div>'; return; }
     const data = applyFilters(raw, 'page');
-    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по текущему фильтру.</div>'; return; }
     content.innerHTML = tabTableHTML('pages', data, [
         { label: 'Страница', fn: r => `<span style="max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;color:var(--blue)" title="${r.page}">${r.page.replace(/https?:\/\/[^/]+/,'')}</span>` },
         { label: 'Клики', r:true, fn: r => fmt(r.clicks) },
@@ -470,7 +472,7 @@ function renderPagesContent(raw) {
 function renderDevicesContent(raw) {
     const content = document.getElementById('detail-tab-content');
     if (!content) return;
-    if (!raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных по устройствам.</div>'; return; }
+    if (!raw || !raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных по устройствам.<br><small style="color:var(--muted)">Запустите setup.sql и сбор данных.</small></div>'; return; }
     const total = raw.reduce((s,r) => s+(r.clicks||0), 0) || 1;
     const devIcon = { DESKTOP:'🖥', MOBILE:'📱', TABLET:'⬜' };
     const devColor = { DESKTOP:'var(--blue)', MOBILE:'var(--green)', TABLET:'var(--yellow)' };
@@ -496,8 +498,9 @@ function renderDevicesContent(raw) {
 function renderGeoContent(raw) {
     const content = document.getElementById('detail-tab-content');
     if (!content) return;
+    if (!raw || !raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных по географии.<br><small style="color:var(--muted)">Запустите сбор данных для обновления.</small></div>'; return; }
     const data = applyFilters(raw, 'country');
-    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по текущему фильтру.</div>'; return; }
     const maxC = data[0].clicks || 1;
     content.innerHTML = `
         <div style="display:flex;justify-content:flex-end;padding:8px 16px;border-bottom:1px solid var(--border)">
@@ -521,8 +524,9 @@ function renderGeoContent(raw) {
 function renderQueryPageContent(raw) {
     const content = document.getElementById('detail-tab-content');
     if (!content) return;
+    if (!raw || !raw.length) { content.innerHTML = '<div class="tab-empty">Нет данных Запрос→Страница.<br><small style="color:var(--muted)">Запустите setup.sql и сбор данных.</small></div>'; return; }
     const data = applyFilters(raw, 'query');
-    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по фильтру.</div>'; return; }
+    if (!data.length) { content.innerHTML = '<div class="tab-empty">Нет данных по текущему фильтру.</div>'; return; }
     // Detect cannibalization: same query → multiple pages
     const byQuery = {};
     data.forEach(r => { if (!byQuery[r.query]) byQuery[r.query] = []; byQuery[r.query].push(r); });
@@ -597,14 +601,13 @@ async function switchDetailTab(tab) {
     const controls = document.getElementById('tab-controls');
     const content = document.getElementById('detail-tab-content');
     const fp = document.getElementById('filter-panel');
+    if (fp) fp.style.display = 'flex'; // always show filter panel
     if (tab === 'overview') {
         if (controls) controls.style.display = 'flex';
-        if (fp) fp.style.display = 'none';
         content.innerHTML = '<div style="height:400px"><canvas id="detailChart"></canvas></div>';
         setTimeout(() => drawDetailChart(S.selectedSite), 50);
     } else {
         if (controls) controls.style.display = 'none';
-        if (fp) fp.style.display = 'flex';
         if (tab === 'keywords') await loadKeywordsTab(S.selectedSite);
         else if (tab === 'pages') await loadPagesTab(S.selectedSite);
         else if (tab === 'devices') await loadDevicesTab(S.selectedSite);
@@ -841,7 +844,7 @@ function renderDetail() {
                         <button class="toggle-btn ${detailVisible.ctr?'active':''}" data-metric="ctr" onclick="toggleMetric('ctr')" style="--tc:#10b981">CTR</button>
                     </div>
                 </div>
-                ${buildFilterPanel().replace('id="filter-panel"', 'id="filter-panel" style="display:none"')}
+                ${buildFilterPanel()}
                 <div id="detail-tab-content" class="panel-body">
                     <div style="height:400px"><canvas id="detailChart"></canvas></div>
                 </div>

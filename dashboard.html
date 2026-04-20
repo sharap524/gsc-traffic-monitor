@@ -311,6 +311,22 @@
         .detail-badge.up { background: rgba(16,185,129,0.15); color: var(--green); }
         .detail-badge.down { background: rgba(239,68,68,0.15); color: var(--red); }
 
+        .detail-tabs { display: flex; gap: 4px; }
+        .detail-tab {
+            padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
+            cursor: pointer; border: 1px solid var(--border); background: transparent;
+            color: var(--muted); transition: all 0.2s;
+        }
+        .detail-tab.active { background: rgba(59,130,246,0.15); color: var(--blue); border-color: rgba(59,130,246,0.4); }
+        .detail-tab:hover { border-color: var(--blue); }
+
+        .geo-bar-wrap { display: flex; align-items: center; gap: 6px; }
+        .geo-bar { height: 6px; background: var(--blue); border-radius: 3px; min-width: 2px; transition: width 0.3s; }
+        .tab-empty { padding: 40px; text-align: center; color: var(--muted); }
+        .tab-loading { padding: 40px; text-align: center; color: var(--muted); }
+        th.sortable { cursor: pointer; user-select: none; }
+        th.sortable:hover { color: var(--text); }
+
         .loading {
             display: flex;
             flex-direction: column;
@@ -532,21 +548,6 @@ function drawOverviewCharts() {
         }
     });
 
-    makeChart('chartPosition', {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{ label: 'Позиция', data: daily.map(d => d.position), borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, borderWidth: 2, pointRadius: 0 }]
-        },
-        options: {
-            ...chartDefaults,
-            scales: {
-                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', font: { size: 10 }, maxTicksLimit: 12 } },
-                y: { reverse: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#f59e0b', font: { size: 10 } } }
-            }
-        }
-    });
-
     const top = D.sites.slice(0, 8);
     if (top.length) {
         makeChart('chartTop', {
@@ -568,6 +569,112 @@ function drawOverviewCharts() {
 
 // Состояние видимости метрик в детальном графике
 let detailVisible = { clicks: true, impressions: true, position: false, ctr: false };
+let detailTab = 'overview';
+
+// ISO 3166-1 alpha-3 → flag emoji
+function countryFlag(code) {
+    if (!code) return '🌍';
+    const map = {
+        'USA':'US','GBR':'GB','RUS':'RU','DEU':'DE','FRA':'FR','CHN':'CN','JPN':'JP',
+        'IND':'IN','BRA':'BR','CAN':'CA','AUS':'AU','ITA':'IT','ESP':'ES','KOR':'KR',
+        'NLD':'NL','TUR':'TR','MEX':'MX','ARG':'AR','POL':'PL','UKR':'UA','IDN':'ID',
+        'THA':'TH','VNM':'VN','PHL':'PH','MYS':'MY','SGP':'SG','NGA':'NG','ZAF':'ZA',
+        'EGY':'EG','SAU':'SA','PAK':'PK','BGD':'BD','ISR':'IL','CHE':'CH','SWE':'SE',
+        'NOR':'NO','DNK':'DK','FIN':'FI','BEL':'BE','AUT':'AT','PRT':'PT','GRC':'GR',
+        'CZE':'CZ','HUN':'HU','ROU':'RO','BGR':'BG','HRV':'HR','SVK':'SK','SVN':'SI',
+        'KAZ':'KZ','BLR':'BY','UZB':'UZ','IRN':'IR','IRQ':'IQ','ARE':'AE','QAT':'QA',
+        'COL':'CO','CHL':'CL','PER':'PE','VEN':'VE','ECU':'EC','CIV':'CI','GHA':'GH',
+        'KEN':'KE','ETH':'ET','TZA':'TZ','MAR':'MA','DZA':'DZ','TUN':'TN','LBY':'LY',
+        'NZL':'NZ','HKG':'HK','TWN':'TW','MMR':'MM','KHM':'KH','LKA':'LK','NPL':'NP'
+    };
+    const iso2 = map[code.toUpperCase()];
+    if (!iso2) return '🌍';
+    return String.fromCodePoint(...[...iso2].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
+async function switchDetailTab(tab) {
+    detailTab = tab;
+    document.querySelectorAll('.detail-tab').forEach(t =>
+        t.classList.toggle('active', t.dataset.tab === tab));
+    const controls = document.getElementById('tab-controls');
+    const content = document.getElementById('detail-tab-content');
+    if (tab === 'overview') {
+        controls.style.display = 'flex';
+        content.innerHTML = '<div style="height:400px"><canvas id="detailChart"></canvas></div>';
+        setTimeout(() => drawDetailChart(S.selectedSite), 50);
+    } else {
+        controls.style.display = 'none';
+        if (tab === 'keywords') await loadKeywordsTab(S.selectedSite);
+        else if (tab === 'geo') await loadGeoTab(S.selectedSite);
+    }
+}
+
+async function loadKeywordsTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    content.innerHTML = '<div class="tab-loading">⏳ Загрузка ключевых слов...</div>';
+    const data = await q('traffic_keywords',
+        `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=200`);
+    if (!data || !data.length) {
+        content.innerHTML = '<div class="tab-empty">Нет данных по ключевым словам.<br>Запустите сбор данных для обновления.</div>';
+        return;
+    }
+    content.innerHTML = `
+        <div class="table-wrap" style="max-height:480px">
+            <table>
+                <thead><tr>
+                    <th>Запрос</th>
+                    <th class="mono" style="text-align:right">Клики</th>
+                    <th class="mono" style="text-align:right">Показы</th>
+                    <th class="mono" style="text-align:right">Позиция</th>
+                    <th class="mono" style="text-align:right">CTR</th>
+                </tr></thead>
+                <tbody>
+                    ${data.map(r => `<tr>
+                        <td style="max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.query}</td>
+                        <td class="mono" style="text-align:right">${fmt(r.clicks)}</td>
+                        <td class="mono" style="text-align:right">${fmt(r.impressions)}</td>
+                        <td class="mono" style="text-align:right">${(r.position||0).toFixed(1)}</td>
+                        <td class="mono" style="text-align:right">${((r.ctr||0)*100).toFixed(2)}%</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+async function loadGeoTab(siteUrl) {
+    const content = document.getElementById('detail-tab-content');
+    content.innerHTML = '<div class="tab-loading">⏳ Загрузка географии...</div>';
+    const data = await q('traffic_geo',
+        `site_url=eq.${encodeURIComponent(siteUrl)}&date=eq.${D.lastDate}&order=clicks.desc&limit=100`);
+    if (!data || !data.length) {
+        content.innerHTML = '<div class="tab-empty">Нет данных по географии.<br>Запустите сбор данных для обновления.</div>';
+        return;
+    }
+    const maxClicks = data[0].clicks || 1;
+    content.innerHTML = `
+        <div class="table-wrap" style="max-height:480px">
+            <table>
+                <thead><tr>
+                    <th>Страна</th>
+                    <th class="mono" style="text-align:right">Клики</th>
+                    <th class="mono" style="text-align:right">Показы</th>
+                    <th class="mono" style="text-align:right">Позиция</th>
+                    <th class="mono" style="text-align:right">CTR</th>
+                    <th style="min-width:120px">Доля кликов</th>
+                </tr></thead>
+                <tbody>
+                    ${data.map(r => `<tr>
+                        <td>${countryFlag(r.country)} ${r.country}</td>
+                        <td class="mono" style="text-align:right">${fmt(r.clicks)}</td>
+                        <td class="mono" style="text-align:right">${fmt(r.impressions)}</td>
+                        <td class="mono" style="text-align:right">${(r.position||0).toFixed(1)}</td>
+                        <td class="mono" style="text-align:right">${((r.ctr||0)*100).toFixed(2)}%</td>
+                        <td><div class="geo-bar-wrap"><div class="geo-bar" style="width:${Math.round((r.clicks/maxClicks)*100)}px"></div><span style="font-size:10px;color:var(--muted)">${Math.round(r.clicks/maxClicks*100)}%</span></div></td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
 
 function toggleMetric(key) {
     detailVisible[key] = !detailVisible[key];
@@ -690,9 +797,18 @@ function sortArrow(col) {
     return `<span class="sort-arrow">${S.sortDir === -1 ? '↓' : '↑'}</span>`;
 }
 
+function filterSites(val) {
+    S.search = val;
+    const q = val.toLowerCase();
+    document.querySelectorAll('tr[data-url]').forEach(tr => {
+        tr.style.display = (!q || tr.dataset.url.includes(q)) ? '' : 'none';
+    });
+}
+
 function renderDetail() {
     const site = D.sites.find(s => s.site_url === S.selectedSite);
     if (!site) { goBack(); return; }
+    detailTab = 'overview';
 
     const daily = siteDaily(S.selectedSite);
     const name = shortUrl(site.site_url);
@@ -748,16 +864,22 @@ function renderDetail() {
             </div>
 
             <div class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">📈 Метрики по дням</div>
-                    <div style="display:flex;gap:8px;">
+                <div class="panel-header" style="flex-wrap:wrap;gap:10px">
+                    <div class="detail-tabs">
+                        <button class="detail-tab active" data-tab="overview" onclick="switchDetailTab('overview')">📈 Обзор</button>
+                        <button class="detail-tab" data-tab="keywords" onclick="switchDetailTab('keywords')">🔑 Ключевые слова</button>
+                        <button class="detail-tab" data-tab="geo" onclick="switchDetailTab('geo')">🌍 География</button>
+                    </div>
+                    <div id="tab-controls" style="display:flex;gap:8px;">
                         <button class="toggle-btn ${detailVisible.clicks?'active':''}" data-metric="clicks" onclick="toggleMetric('clicks')" style="--tc:#3b82f6">Клики</button>
                         <button class="toggle-btn ${detailVisible.impressions?'active':''}" data-metric="impressions" onclick="toggleMetric('impressions')" style="--tc:#8b5cf6">Показы</button>
                         <button class="toggle-btn ${detailVisible.position?'active':''}" data-metric="position" onclick="toggleMetric('position')" style="--tc:#f59e0b">Позиция</button>
                         <button class="toggle-btn ${detailVisible.ctr?'active':''}" data-metric="ctr" onclick="toggleMetric('ctr')" style="--tc:#10b981">CTR</button>
                     </div>
                 </div>
-                <div class="panel-body"><div style="height:400px"><canvas id="detailChart"></canvas></div></div>
+                <div id="detail-tab-content" class="panel-body">
+                    <div style="height:400px"><canvas id="detailChart"></canvas></div>
+                </div>
             </div>
         </main>
     `;
@@ -841,7 +963,7 @@ function render() {
                 </div>
             </div>
 
-            <div class="grid">
+            <div class="grid-wide" style="grid-template-columns:1fr">
                 <div class="panel">
                     <div class="panel-header">
                         <div class="panel-title">📈 Ежедневный трафик</div>
@@ -852,17 +974,13 @@ function render() {
                     </div>
                     <div class="panel-body"><div class="chart-box"><canvas id="chartTraffic"></canvas></div></div>
                 </div>
-                <div class="panel">
-                    <div class="panel-header"><div class="panel-title">📍 Средняя позиция</div></div>
-                    <div class="panel-body"><div class="chart-box"><canvas id="chartPosition"></canvas></div></div>
-                </div>
             </div>
 
             <div class="grid-wide">
                 <div class="panel">
                     <div class="panel-header">
                         <div class="panel-title">🌐 Все сайты <span style="font-weight:400;font-size:11px;color:var(--muted);margin-left:8px">нажмите на сайт для детального просмотра</span></div>
-                        <input type="text" class="search-input" placeholder="Поиск..." value="${S.search}" oninput="S.search=this.value;render()">
+                        <input type="text" class="search-input" id="siteSearch" placeholder="Поиск..." value="${S.search}" oninput="filterSites(this.value)">
                     </div>
                     <div class="panel-body flush">
                         <div class="table-wrap">
@@ -879,7 +997,7 @@ function render() {
                                 </thead>
                                 <tbody>
                                     ${sites.map((s, i) => `
-                                        <tr class="clickable" onclick="openSite('${s.site_url.replace(/'/g, "\\'")}')">
+                                        <tr class="clickable" data-url="${shortUrl(s.site_url).toLowerCase()}" onclick="openSite('${s.site_url.replace(/'/g, "\\'")}')">
                                             <td>
                                                 <div class="site-cell">
                                                     <div class="site-dot ${status(s)}"></div>
